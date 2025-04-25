@@ -1,0 +1,74 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;  /* Prendre toute la hauteur de la page */
+}
+
+
+
+
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+button {
+  margin-top: 16px;
+}
+.auth-container {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  padding: 0 16px; 
+  justify-content: center;
+  align-items: center;
+    background-image: url('/assetsss/attijari.jpg'); /* Remplace par le chemin de ton image */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  
+  
+  .auth-form {
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgb(247, 243, 243);
+    width: 100%;
+    max-width: 400px;
+    /*box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);*/
+  }
+ 
+  
+  h2 {
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+  .message-erreur {
+    color: rgb(255, 255, 255);
+    margin: 10px 0;
+    font-weight: bold;
+    text-align: center;
+  }
+  
+  /* Si tu utilises aussi la classe "message" + "error" ou "success" */
+  .message {
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    font-weight: bold;
+    text-align: center;
+  }
+  
+  .message.error {
+    background-color: #ffffff;
+    color: #842029;
+  }
+  
+  .message.success {
+    background-color: #d1e7dd;
+    color: #0f5132;
+  }
+  
+  

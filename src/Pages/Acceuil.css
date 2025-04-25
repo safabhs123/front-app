@@ -1,0 +1,112 @@
+/* Général */
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #f4f6f9;
+  margin: 0;
+  padding: 0;
+}
+
+h1 {
+  text-align: center;
+  font-size: 2.5rem;
+  margin-top: 2rem;
+  color: #333;
+}
+
+/* Conteneur principal */
+div {
+  text-align: center;
+  padding: 20px;
+}
+
+/* Boutons */
+.button-container {
+  display: flex; /* Utilisation de Flexbox */
+  justify-content: center; /* Centre les boutons horizontalement */
+  align-items: center; /* Centre les boutons verticalement */
+  flex-wrap: wrap; /* Permet aux boutons de passer à la ligne suivante si nécessaire */
+  gap: 10px; /* Ajoute de l'espace entre les boutons */
+  margin-top: 20px; /* Ajoute un peu d'espace au-dessus */
+}
+
+button {
+  padding: 12px 20px;
+  margin: 0; /* Supprime le margin vertical par défaut */
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s, transform 0.2s;
+  flex-grow: 0; /* Évite que les boutons s'étirent */
+}
+
+
+
+
+button:hover {
+  transform: scale(1.05);
+}
+
+/* Style pour le bouton de déconnexion */
+button:active {
+  transform: scale(0.98);
+}
+
+button:nth-child(1) {
+  background-color: #4caf50;
+  color: white;
+}
+
+button:nth-child(2) {
+  background-color: red;
+  color: white;
+}
+
+button:nth-child(3) {
+  background-color: #2196f3;
+  color: white;
+}
+
+/* Profil */
+.ProfileWrapper {
+  margin-top: 2rem;
+  padding: 20px;
+  background-color: #fff;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  width: 70%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.ProfileWrapper h2 {
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.ProfileWrapper p {
+  font-size: 1.1rem;
+  color: #555;
+  margin: 10px 0;
+}
+
+/* Card Style Profil */
+.MuiCard-root {
+  width: 100%;
+  border-radius: 16px;
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.MuiCardContent-root {
+  padding: 20px;
+}
+
+.MuiButton-contained {
+  background-color: #4caf50;
+  color: white;
+  margin: 10px;
+}
+
+.MuiButton-contained:hover {
+  background-color: #45a049;
+}
