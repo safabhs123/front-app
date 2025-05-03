@@ -1,74 +1,258 @@
-html, body {
+/* Reset and base styles */
+* {
   margin: 0;
   padding: 0;
-  height: 100%;  /* Prendre toute la hauteur de la page */
+  box-sizing: border-box;
+  font-family: "Arial", sans-serif;
 }
 
+body {
+  margin: 0;
+  padding: 0;
+}
 
+/* Variables */
+:root {
+  --attijari-yellow: #fff2c6;
+  --attijari-yellow-dark: #ffcc00;
+  --attijari-orange: #ff9966;
+  --white: #ffffff;
+  --black: #000000;
+  --gray-100: #f8f9fa;
+  --gray-200: #e9ecef;
+  --gray-300: #dee2e6;
+  --gray-400: #ced4da;
+  --gray-500: #adb5bd;
+  --gray-600: #6c757d;
+  --gray-700: #495057;
+  --gray-800: #343a40;
+  --gray-900: #212529;
+  --red-100: #f8d7da;
+  --red-700: #842029;
+  --green-100: #d1e7dd;
+  --green-700: #0f5132;
+}
 
+/* Login Container */
+.login-container {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+}
 
+/* Left Column */
+.left-column {
+  width: 40%;
+  background-color: var(--attijari-yellow);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 40px;
+  position: relative;
+}
 
-.auth-header {
-  text-align: center;
+.left-content {
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.welcome-title {
+  font-size: 48px;
+  font-weight: bold;
+  color: var(--black);
+  margin-bottom: 40px;
+}
+
+.welcome-text {
+  font-size: 18px;
+  line-height: 1.6;
+  color: var(--gray-800);
   margin-bottom: 20px;
 }
 
-button {
-  margin-top: 16px;
+.copyright {
+  position: absolute;
+  bottom: 40px;
+  left: 40px;
+  font-size: 14px;
+  color: var(--gray-700);
 }
-.auth-container {
-  height: 100vh;
-  width: 100vw;
+
+/* Right Column */
+.right-column {
+  width: 60%;
+  background-color: var(--white);
   display: flex;
-  padding: 0 16px; 
-  justify-content: center;
+  flex-direction: column;
+  padding: 40px;
+}
+
+.logo-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 80px;
+}
+
+.logo {
+  height: auto;
+}
+
+.login-form-container {
+  max-width: 500px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.login-title {
+  font-size: 32px;
+  font-weight: bold;
+  color: var(--black);
+  margin-bottom: 40px;
+}
+
+.login-form {
+  width: 100%;
+}
+
+.form-group {
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.form-input {
+  width: 100%;
+  padding: 15px;
+  border: 1px solid var(--gray-300);
+  border-radius: 4px;
+  font-size: 16px;
+  background-color: var(--gray-100);
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--attijari-orange);
+  box-shadow: 0 0 0 2px rgba(255, 153, 102, 0.2);
+}
+
+.form-input::placeholder {
+  color: var(--gray-500);
+}
+
+.forgot-password-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+.forgot-password {
+  color: var(--attijari-orange);
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.forgot-password:hover {
+  text-decoration: underline;
+}
+
+.login-button {
+  width: 50%;
+  padding: 15px;
+  background-color: var(--attijari-orange);
+  color: var(--white);
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-top: 20px;
+  margin-left: 50%;
+}
+
+.login-button:hover {
+  background-color: #ff8855;
+}
+
+.login-button:disabled {
+  background-color: var(--gray-400);
+  cursor: not-allowed;
+}
+
+/* Message Alert */
+.message-alert {
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.message-alert.error {
+  background-color: var(--red-100);
+  color: var(--red-700);
+  border: 1px solid #f5c2c7;
+}
+
+.message-alert.success {
+  background-color: var(--green-100);
+  color: var(--green-700);
+  border: 1px solid #badbcc;
+}
+
+/* Loading Spinner */
+.loading-container {
+  display: flex;
   align-items: center;
-    background-image: url('/assetsss/attijari.jpg'); /* Remplace par le chemin de ton image */
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+  justify-content: center;
+}
+
+.loading-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--white);
+  border-top-color: transparent;
+  border-radius: 50%;
+  margin-right: 10px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
-  
-  
-  .auth-form {
-    background-color: rgba(255, 255, 255, 0.8);
-    padding: 2rem;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgb(247, 243, 243);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .login-container {
+    flex-direction: column;
+  }
+
+  .left-column,
+  .right-column {
     width: 100%;
-    max-width: 400px;
-    /*box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);*/
   }
- 
-  
-  h2 {
-    text-align: center;
-    margin-bottom: 1rem;
+
+  .left-column {
+    padding: 30px;
+    min-height: 300px;
   }
-  .message-erreur {
-    color: rgb(255, 255, 255);
-    margin: 10px 0;
-    font-weight: bold;
-    text-align: center;
+
+  .copyright {
+    position: absolute;
+    bottom: 40px;
+    left: 100px;
+    font-size: 14px;
+    color: var(--gray-700);
+
   }
-  
-  /* Si tu utilises aussi la classe "message" + "error" ou "success" */
-  .message {
-    margin-top: 10px;
-    padding: 10px;
-    border-radius: 5px;
-    font-weight: bold;
-    text-align: center;
+
+  .logo-container {
+    margin-bottom: 40px;
   }
-  
-  .message.error {
-    background-color: #ffffff;
-    color: #842029;
+
+  .welcome-title {
+    font-size: 36px;
+    margin-bottom: 20px;
   }
-  
-  .message.success {
-    background-color: #d1e7dd;
-    color: #0f5132;
-  }
-  
-  
+}
