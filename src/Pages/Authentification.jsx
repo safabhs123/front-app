@@ -52,16 +52,21 @@ const Authentification = () => {
         setSeverity("success");
 
         // ✅ Redirection immédiate après connexion réussie
-        if (role === "ADMIN") {
-          navigate("/dashboard", { replace: true });
+        if (role === "ADMIN_USER") {
+          navigate('/dashboard', { replace: true });
+        } else if (role === "ADMIN_FUNCTIONAL") {
+          navigate('/controle-factures', { replace: true });
         } else if (role === "EMPLOYEE") {
           navigate("/acceuil", { replace: true });
+        } else {
+          setMessage("Rôle non reconnu");
+          setSeverity("error");
         }
-        
       }
     } catch (error) {
       console.error("Erreur login :", error);
       setSeverity("error");
+  
       if (error.response) {
         setMessage(error.response.data.message || "Erreur de connexion");
       } else if (error.request) {
@@ -76,7 +81,7 @@ const Authentification = () => {
 
   return (
     <Box className="auth-container" maxWidth="xs">
-      <form onSubmit={handleSubmit}>
+      <form   autoComplete="new-password" onSubmit={handleSubmit}>
         <Typography variant="h4" className="auth-header" gutterBottom>
           <span style={{ color: 'white' }}>Authentification</span>
         </Typography>
@@ -94,6 +99,7 @@ const Authentification = () => {
             fullWidth
             value={matricule}
             onChange={(e) => setMatricule(e.target.value)}
+             autoComplete="new-password"
             required
             margin="normal"
           />
@@ -107,6 +113,7 @@ const Authentification = () => {
             fullWidth
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+             autoComplete="new-password"
             required
             margin="normal"
           />

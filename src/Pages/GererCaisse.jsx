@@ -22,12 +22,13 @@ export default function GererCaisse() {
   const [typesDeFonds, setTypesDeFonds] = useState([]);
 
   useEffect(() => {
-    axios.get("http://localhost:8080/api/caisses/regions").then(res => setRegions(res.data));
-    axios.get("http://localhost:8080/api/caisses/transporteurs").then(res => setTransporteurs(res.data));
+    axios.get("http://localhost:8080/api/caisses/regions")
+    .then(res => setRegions(res.data));       axios.get("http://localhost:8080/api/caisses/transporteurs").then(res => setTransporteurs(res.data));
     axios.get("http://localhost:8080/api/caisses/type-fonds").then(res => setTypesDeFonds(res.data));
     loadCaisses();
+    console.log("Régions disponibles :", regions);
+    console.log("Région actuelle dans caisse:", caisse.region);
   }, []);
-
   const loadCaisses = () => {
     axios.get("http://localhost:8080/api/caisses/all")
       .then(res => setCaisses(res.data));
@@ -38,14 +39,21 @@ export default function GererCaisse() {
   };
 
   const handleAdd = () => {
+    console.log("Données envoyées :", caisse);
+
     axios.post("http://localhost:8080/api/caisses/add", caisse)
       .then(() => {
         loadCaisses();
         setCaisse({ idCaisse: '', region: '', transporteur: '', typeDeFonds: '' });
         setEditId(null);
       })
-      .catch(err => console.error("Error adding caisse: ", err));
-  };
+      .catch(error => {
+        if (error.response) {
+          console.error("Erreur backend :", error.response.data); // 👈 ici on capture l’erreur réelle
+        } else {
+          console.error("Erreur inconnue :", error);
+        }
+      });  };
 
   const handleEdit = () => {
     axios.put(`http://localhost:8080/api/caisses/update/${editId}`, caisse)
@@ -57,7 +65,7 @@ export default function GererCaisse() {
       .catch(err => console.error("Error editing caisse: ", err));
   };
 
-  // Nouveau : Ouvrir boîte de confirmation
+ 
   const handleOpenDialog = (id) => {
     setselectedidCaisse(id);
     setOpenDialog(true);
@@ -66,9 +74,25 @@ export default function GererCaisse() {
   const handleCloseDialog = () => {
     setselectedidCaisse(null);
     setOpenDialog(false);
+  }; 
+  const getRegionFromId = (idCaisse) => {
+    if (!idCaisse) return "";
+  
+    const cleanedId = idCaisse.trim(); // Enlève les espaces
+    const prefix = cleanedId.substring(0, 5); // Prend les 5 premiers caractères
+  
+    switch (prefix) {
+      case "00099": return "Tunis";
+      case "00199": return "Sousse";
+      case "00299": return "Nabeul";
+      case "00399": return "Sfax";
+      case "00499": return "Gabes";
+      case "00599": return "Gafsa";
+      case "00699": return "Jendouba";
+      case "00799": return "Medenin";
+      default: return "Inconnue";
+    }
   };
-
-  // Nouveau : Confirmer suppression
   const confirmDelete = () => {
     axios.delete(`http://localhost:8080/api/caisses/delete/${selectedidCaisse}`)
       .then(() => {
@@ -77,35 +101,48 @@ export default function GererCaisse() {
       })
       .catch(err => console.error("Erreur suppression :", err));
   };
+  const isEditing = editId !== null;
 
   return (
     <Box p={3}>
       <Box display="flex" gap={4}>
-        {/* FORMULAIRE */}
+        
         <Box flex={1}>
           <Paper elevation={3} sx={{ p: 3 }}>
             <Typography variant="h6" gutterBottom>Ajouter / Modifier une Caisse</Typography>
+        
+<TextField
+fullWidth
+label="ID Caisse"
+name="idCaisse"
+value={caisse.idCaisse}
+onChange={(e) => {
+  const id = e.target.value;
+  if (!isEditing) {
+    setCaisse({
+      ...caisse,
+      idCaisse: id,
+      region: getRegionFromId(id),
+    });
+  }
+}}
+InputProps={{ readOnly: isEditing }}
+sx={{ mb: 2 }}
+/>
 
-            <TextField
-              fullWidth
-              label="ID Caisse"
-              name="idCaisse"
-              value={caisse.idCaisse}
-              onChange={handleChange}
-              sx={{ mb: 2 }}
-            />
 
-            <FormControl fullWidth sx={{ mb: 2 }}>
-              <InputLabel>Région</InputLabel>
-              <Select
-                name="region"
-                value={caisse.region}
-                onChange={handleChange}
-                label="Région"
-              >
-                {regions.map(r => <MenuItem key={r} value={r}>{r}</MenuItem>)}
-              </Select>
-            </FormControl>
+
+<FormControl fullWidth sx={{ mb: 2 }}>
+  <TextField
+    label="Région"
+    name="region"
+    value={caisse.region}
+    InputProps={{ readOnly: isEditing }}
+    fullWidth
+  />
+</FormControl>
+
+
 
             <FormControl fullWidth sx={{ mb: 2 }}>
               <InputLabel>Transporteur</InputLabel>
