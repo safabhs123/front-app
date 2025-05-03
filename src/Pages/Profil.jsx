@@ -135,17 +135,17 @@ const Profil = () => {
 
 				<nav className="sidebar-nav">
 					<ul>
-						<li>
+						<li className="active">
 							<Link to="/accueil">
 								<Home size={20} />
 								<span>Tableau de bord</span>
 							</Link>
 						</li>
 						<li>
-							<a href="/factures">
+							<Link to="/controle-factures">
 								<FileText size={20} />
 								<span>Factures</span>
-							</a>
+							</Link>
 						</li>
 						<li>
 							<Link to="/caisse">

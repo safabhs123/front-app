@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "../api/axiosConfig.jsx";
 import "./Accueil.css"; // Import du CSS
 import {
 	Bell,
@@ -22,20 +21,6 @@ import {
 } from "lucide-react";
 function Acceuil() {
 	const navigate = useNavigate();
-	const role = localStorage.getItem("userRole");
-	const [profil, setProfil] = useState({});
-
-	useEffect(() => {
-		const matricule = localStorage.getItem("matricule");
-		if (matricule) {
-			axios
-				.get(`http://localhost:8080/api/utilisateur/profil/${matricule}`)
-				.then((res) => setProfil(res.data))
-				.catch((err) =>
-					console.error("Erreur lors de la récupération du profil :", err)
-				);
-		}
-	}, []);
 
 	const [showProfil, setShowProfil] = useState(false);
 	const handleProfilClick = () => {
@@ -99,28 +84,28 @@ function Acceuil() {
 				<nav className="sidebar-nav">
 					<ul>
 						<li className="active">
-							<a href="/acceuil">
+							<Link to="/acceuil">
 								<Home size={20} />
 								<span>Tableau de bord</span>
-							</a>
+							</Link>
 						</li>
 						<li>
-							<a href="/factures">
+							<Link to="/controle-factures">
 								<FileText size={20} />
 								<span>Factures</span>
-							</a>
+							</Link>
 						</li>
 						<li>
-							<a href="/caisse">
+							<Link to="/caisse">
 								<CreditCard size={20} />
 								<span>Caisse</span>
-							</a>
+							</Link>
 						</li>
 						<li>
-							<a href="/rapports">
+							<Link to="/rapports">
 								<PieChart size={20} />
 								<span>Rapports</span>
-							</a>
+							</Link>
 						</li>
 					</ul>
 				</nav>

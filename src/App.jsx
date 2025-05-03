@@ -24,9 +24,9 @@ function App() {
 				<Route
 					path="/controle-factures"
 					element={
-						<PrivateRoute allowedRoles={["ADMIN_FUNCTIONAL"]}>
-							<ControleFactures />
-						</PrivateRoute>
+						// <PrivateRoute allowedRoles={["ADMIN_FUNCTIONAL"]}>
+						<ControleFactures />
+						// </PrivateRoute>
 					}
 				/>
 				<Route

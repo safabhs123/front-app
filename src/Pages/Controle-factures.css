@@ -1,0 +1,258 @@
+@import "./Accueil.css";
+
+
+
+/* Controle Factures specific styles */
+.page-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.action-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.action-button.primary {
+  background-color: var(--attijari-orange);
+  color: var(--white);
+  border: none;
+}
+
+.action-button.primary:hover {
+  background-color: var(--attijari-orange-dark);
+}
+
+.action-button.secondary {
+  background-color: var(--white);
+  color: var(--gray-700);
+  border: 1px solid var(--gray-300);
+}
+
+.action-button.secondary:hover {
+  background-color: var(--gray-50);
+  border-color: var(--gray-400);
+}
+
+/* Filters */
+.filters-container {
+  background-color: var(--white);
+  border-radius: var(--border-radius);
+  padding: 16px;
+  margin-bottom: 24px;
+  box-shadow: var(--box-shadow);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.filters-group {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.filter {
+  display: flex;
+  flex-direction: column;
+  min-width: 180px;
+}
+
+.filter label {
+  font-size: 12px;
+  color: var(--gray-600);
+  margin-bottom: 4px;
+}
+
+.select-wrapper {
+  position: relative;
+}
+
+.select-wrapper select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--gray-300);
+  border-radius: 4px;
+  background-color: var(--white);
+  appearance: none;
+  font-size: 14px;
+  color: var(--gray-800);
+}
+
+.select-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--gray-500);
+}
+
+.date-input {
+  padding: 8px 12px;
+  border: 1px solid var(--gray-300);
+  border-radius: 4px;
+  font-size: 14px;
+  color: var(--gray-800);
+}
+
+.filters-actions {
+  display: flex;
+  flex-wrap: row;
+  gap: 8px;
+}
+
+.filter-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background-color: var(--white);
+  border: 1px solid var(--gray-300);
+  border-radius: 4px;
+  color: var(--gray-700);
+  font-size: 14px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.filter-button:hover {
+  background-color: var(--gray-50);
+  border-color: var(--gray-400);
+}
+
+/* Table Actions */
+.table-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.table-action-button {
+  padding: 6px 10px;
+  background-color: var(--gray-100);
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  color: var(--gray-700);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.table-action-button:hover {
+  background-color: var(--gray-200);
+  color: var(--gray-900);
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 24px;
+}
+
+.pagination-button {
+  padding: 8px 16px;
+  background-color: var(--white);
+  border: 1px solid var(--gray-300);
+  color: var(--gray-700);
+  font-size: 14px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.pagination-button:hover:not(:disabled) {
+  background-color: var(--gray-50);
+  color: var(--gray-900);
+}
+
+.pagination-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination-numbers {
+  display: flex;
+  margin: 0 8px;
+}
+
+.pagination-number {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--white);
+  border: 1px solid var(--gray-300);
+  color: var(--gray-700);
+  font-size: 14px;
+  cursor: pointer;
+  margin: 0 4px;
+  transition: var(--transition);
+}
+
+.pagination-number:hover {
+  background-color: var(--gray-50);
+}
+
+.pagination-number.active {
+  background-color: var(--attijari-yellow);
+  border-color: var(--attijari-yellow-dark);
+  color: var(--gray-900);
+  font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .filters-container {
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+  }
+
+  .filters-actions {
+    justify-content: flex-end;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    gap: 16px;
+    align-items: flex-start;
+  }
+
+  .page-actions {
+    width: 100%;
+  }
+
+  .action-button {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .filters-group {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .filter {
+    min-width: 100%;
+  }
+
+  .filters-actions {
+    flex-wrap: wrap;
+  }
+
+  .filter-button {
+    flex: 1;
+    justify-content: center;
+  }
+}

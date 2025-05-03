@@ -409,7 +409,7 @@ TOTAL Remise :
 				<nav className="sidebar-nav">
 					<ul>
 						<li>
-							<Link to="/accueil">
+							<Link to="/acceuil">
 								<Home size={20} />
 								<span>Tableau de bord</span>
 							</Link>
@@ -624,7 +624,12 @@ TOTAL Remise :
 
 							{facture.lignes.length === 0 ? (
 								<div className="empty-state">
+									<FileText size={48} className="empty-icon" />
 									<p>Aucune ligne de facture ajoutée</p>
+									<button className="add-line-button" onClick={addLigne}>
+										<Plus size={16} />
+										<span>Ajouter une ligne</span>
+									</button>
 								</div>
 							) : (
 								facture.lignes.map((ligne, index) => (

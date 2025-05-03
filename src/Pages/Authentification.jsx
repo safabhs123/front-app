@@ -51,7 +51,7 @@ const Authentification = () => {
 				} else if (role === "ADMIN_FUNCTIONAL") {
 					navigate("/controle-factures", { replace: true });
 				} else if (role === "EMPLOYEE") {
-					navigate("/acceuil", { replace: true });
+					navigate("/accueil", { replace: true });
 				} else {
 					setMessage("Rôle non reconnu");
 					setSeverity("error");
