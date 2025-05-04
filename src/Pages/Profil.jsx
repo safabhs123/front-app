@@ -41,7 +41,7 @@ const Profil = () => {
 		if (matricule) {
 			axios
 				.get(`http://localhost:8080/api/utilisateur/profil/${matricule}`)
-				.then((res) => setProfil(res.data))
+				.then((res) => { console.log(res.data);setProfil(res.data)})
 				.catch((err) =>
 					console.error("Erreur lors de la récupération du profil :", err)
 				);
@@ -229,7 +229,7 @@ const Profil = () => {
 											/>
 										</>
 									) : (
-										<h2>{`${userData.prenom} ${userData.nom}`}</h2>
+										<h2>{`${userData?.prenom} ${userData?.nom}`}</h2>
 									)}
 									<div className="profile-role">
 										<Shield size={16} />
@@ -247,7 +247,7 @@ const Profil = () => {
 												<User size={16} />
 												<span>Matricule</span>
 											</div>
-											<div className="info-value">{userData.matricule}</div>
+											<div className="info-value">{userData?.matricule}</div>
 										</div>
 
 										<div className="profile-info-item">
@@ -285,7 +285,7 @@ const Profil = () => {
 														className="edit-input"
 													/>
 												) : (
-													userData.telephone
+													userData?.telephone
 												)}
 											</div>
 										</div>
@@ -305,7 +305,7 @@ const Profil = () => {
 														className="edit-input"
 													/>
 												) : (
-													userData.dateDebut
+													userData?.dateDebut
 												)}
 											</div>
 										</div>

@@ -34,7 +34,7 @@ const Authentification = () => {
 			);
 
 			if (response.status === 200) {
-				const role = response.data;
+				const role = response.data.role;
 
 				localStorage.setItem("role", role);
 				localStorage.setItem("matricule", matricule);

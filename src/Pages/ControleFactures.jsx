@@ -125,7 +125,7 @@ const ControleFacture = () => {
 				<nav className="sidebar-nav">
 					<ul>
 						<li className="active">
-							<Link to="//accueil">
+							<Link to="/accueil">
 								<Home size={20} />
 								<span>Tableau de bord</span>
 							</Link>
