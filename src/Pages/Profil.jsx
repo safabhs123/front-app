@@ -26,15 +26,12 @@ const Profil = () => {
 		nom: "",
 		prenom: "",
 		role: "",
-		email: "utilisateur@attijaribank.com",
-		telephone: "+216 71 123 456",
-		dateDebut: "01/01/2022",
-		departement: "Finance",
-		agence: "Tunis Centre",
+		dateDebutTravail: "01/01/2022",
+		
 	});
 	const [isEditing, setIsEditing] = useState(false);
 	const [editData, setEditData] = useState({});
-	const role = localStorage.getItem("userRole");
+	const role = localStorage.getItem("role");
 	const [profil, setProfil] = useState({});
 	const matricule = localStorage.getItem("matricule");
 	const getProfil = async () => {
@@ -49,45 +46,32 @@ const Profil = () => {
 	};
 
 	useEffect(() => {
-		// Get user info from localStorage
 		const matricule = localStorage.getItem("matricule") || "";
 		const role = localStorage.getItem("role") || "";
 		if (matricule && role) {
 			getProfil();
 		}
-		if (profil) {
+	}, []);
+	useEffect(() => {
+		if (profil && profil.matricule) {
 			setUserData({
 				matricule: profil.matricule,
 				nom: profil.nom,
 				prenom: profil.prenom,
 				role: profil.role,
-				email: profil.email,
-				telephone: profil.telephone,
-				dateDebut: profil.dateDebut,
-				departement: profil.departement,
-				agence: profil.agence,
-			});
-		} else {
-			setUserData({
-				matricule: matricule,
-				nom: "Doe",
-				prenom: "John",
-				role: role,
-				email: "j.doe@attijaribank.com",
-				telephone: "+216 71 123 456",
-				dateDebut: "01/01/2022",
-				departement: "Finance",
-				agence: "Tunis Centre",
+				dateDebutTravail: profil.dateDebutTravail,
 			});
 		}
-	}, []);
+	}, [profil]);
+	
+	
 
 	const toggleSidebar = () => {
 		setSidebarOpen(!sidebarOpen);
 	};
 
 	const handleLogout = () => {
-		localStorage.removeItem("role");
+		//localStorage.removeItem("role");
 		localStorage.removeItem("matricule");
 		localStorage.removeItem("motDePasse");
 		window.location.href = "/";
@@ -134,41 +118,62 @@ const Profil = () => {
 				</div>
 
 				<nav className="sidebar-nav">
-					<ul>
-						<li className="active">
-							<Link to="/accueil">
-								<Home size={20} />
-								<span>Tableau de bord</span>
+				  <ul>
+					{role === "ADMIN_USER" ? (
+					  // Afficher uniquement ce lien pour ADMIN_USER
+					  <li>
+						<Link to="/utilisateurs">
+						  <CreditCard size={20} />
+						  <span>Gérer Utilisateurs</span>
+						</Link>
+					  </li>
+					) : (
+					  // Afficher les autres liens pour les autres rôles
+					  <>
+					  {role === "ADMIN_FUNCTIONAL" && (
+						<>
+						  <li className="active">
+							<Link to="/acceuil">
+							  <Home size={20} />
+							  <span>Tableau de bord</span>
 							</Link>
-						</li>
-						<li>
+						  </li>
+						  <li>
 							<Link to="/controle-factures">
-								<FileText size={20} />
-								<span>Factures</span>
+							  <FileText size={20} />
+							  <span>Factures</span>
 							</Link>
-						</li>
-						<li>
-							<Link to="/caisse">
-								<CreditCard size={20} />
-								<span>Caisse</span>
+						  </li>
+						  {/* <li>
+							<Link to="/gerer-caisse">
+							  <CreditCard size={20} />
+							  <span>Caisse</span>
 							</Link>
-						</li>
-						<li>
+						  </li> */}
+						  <li>
 							<Link to="/rapports">
-								<PieChart size={20} />
-								<span>Rapports</span>
+							  <PieChart size={20} />
+							  <span>Rapports</span>
 							</Link>
-						</li>
-					</ul>
+						  </li>
+						</>
+					  )}
+					</>
+					
+					)}
+				  </ul>
 				</nav>
-
-				<div className="sidebar-footer">
-					<button className="logout-button" onClick={handleLogout}>
-						<LogOut size={20} />
-						<span>Déconnexion</span>
-					</button>
-				</div>
-			</aside>
+				
+{/* 				
+								<div className="sidebar-footer">
+									<button className="logout-button" onClick={handleLogout}>
+										<LogOut size={20} />
+										<span>Déconnexion</span>
+									</button>
+								</div> */}
+							</aside>
+				
+							
 
 			{/* Main Content */}
 			<main
@@ -182,7 +187,7 @@ const Profil = () => {
 						<button className="menu-toggle" onClick={toggleSidebar}>
 							<Menu size={24} />
 						</button>
-						<Link to="/accueil" className="back-link">
+						<Link to="/acceuil" className="back-link">
 							<ArrowLeft size={20} />
 							<span>Retour au tableau de bord</span>
 						</Link>
@@ -250,7 +255,7 @@ const Profil = () => {
 											<div className="info-value">{userData?.matricule}</div>
 										</div>
 
-										<div className="profile-info-item">
+										{/* <div className="profile-info-item">
 											<div className="info-label">
 												<Mail size={16} />
 												<span>Email</span>
@@ -268,9 +273,9 @@ const Profil = () => {
 													userData.email
 												)}
 											</div>
-										</div>
+										</div> */}
 
-										<div className="profile-info-item">
+										{/* <div className="profile-info-item">
 											<div className="info-label">
 												<Phone size={16} />
 												<span>Téléphone</span>
@@ -288,7 +293,7 @@ const Profil = () => {
 													userData?.telephone
 												)}
 											</div>
-										</div>
+										</div> */}
 
 										<div className="profile-info-item">
 											<div className="info-label">
@@ -299,20 +304,20 @@ const Profil = () => {
 												{isEditing ? (
 													<input
 														type="text"
-														name="dateDebut"
-														value={editData.dateDebut}
+														name="dateDebutTravail"
+														value={editData.dateDebutTravail}
 														onChange={handleInputChange}
 														className="edit-input"
 													/>
 												) : (
-													userData?.dateDebut
+													userData?.dateDebutTravail
 												)}
 											</div>
 										</div>
 									</div>
 								</div>
 
-								<div className="profile-section">
+								{/* <div className="profile-section">
 									<h3>Informations professionnelles</h3>
 									<div className="profile-info-grid">
 										<div className="profile-info-item">
@@ -355,7 +360,7 @@ const Profil = () => {
 											</div>
 										</div>
 									</div>
-								</div>
+								</div> */}
 
 								{isEditing && (
 									<div className="edit-actions">

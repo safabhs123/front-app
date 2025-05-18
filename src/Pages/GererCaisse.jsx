@@ -26,8 +26,9 @@ import {
 	DialogTitle,
 	DialogContent,
 	DialogContentText,
-	DialogActions,
+	DialogActions,Table,TableHead, TableRow, TableCell, TableBody 
 } from "@mui/material";
+
 export default function GererCaisse() {
 	const navigate = useNavigate();
 
@@ -219,7 +220,7 @@ export default function GererCaisse() {
 				<nav className="sidebar-nav">
 					<ul>
 						<li>
-							<Link to="/accueil">
+							<Link to="/acceuil">
 								<Home size={20} />
 								<span>Tableau de bord</span>
 							</Link>
@@ -231,13 +232,13 @@ export default function GererCaisse() {
 							</Link>
 						</li>
 						<li>
-							<Link to="/caisse">
+							<Link to="/gerer-caisse">
 								<CreditCard size={20} />
 								<span>Caisse</span>
 							</Link>
 						</li>
 						<li>
-							<Link to="/rapports">
+							<Link to="/rapportcomparaison">
 								<PieChart size={20} />
 								<span>Rapports</span>
 							</Link>
@@ -358,49 +359,54 @@ export default function GererCaisse() {
 									</Button>
 								</Paper>
 							</Box>
-
-							{/* LISTE */}
-							<Box flex={1}>
-								<Typography variant="h6" gutterBottom>
-									Liste des Caisses
-								</Typography>
-								{caisses.map((c) => (
-									<Paper key={c.idCaisse} sx={{ p: 2, mb: 2 }}>
-										<Typography>
-											<strong>ID :</strong> {c.idCaisse}
-										</Typography>
-										<Typography>
-											<strong>Région :</strong> {c.region}
-										</Typography>
-										<Typography>
-											<strong>Transporteur :</strong> {c.transporteur}
-										</Typography>
-										<Typography>
-											<strong>Type de Fonds :</strong> {c.typeDeFonds}
-										</Typography>
-										<Box mt={1}>
-											<Button
-												size="small"
-												onClick={() => {
-													setCaisse(c);
-													setEditId(c.idCaisse);
-												}}
-											>
-												Modifier
-											</Button>
-											<Button
-												size="small"
-												color="error"
-												onClick={() => handleOpenDialog(c.idCaisse)}
-												sx={{ ml: 2 }}
-											>
-												Supprimer
-											</Button>
-										</Box>
-									</Paper>
-								))}
 							</Box>
-						</Box>
+							<Box flex={1} mr={2}>
+        <Typography variant="h6" gutterBottom>
+          Liste des Caisses
+        </Typography>
+        <Paper sx={{ p: 2, mb: 2 }}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>ID</TableCell>
+                <TableCell>Région</TableCell>
+                <TableCell>Transporteur</TableCell>
+                <TableCell>Type de Fonds</TableCell>
+                <TableCell>Actions</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {caisses.map((c) => (
+                <TableRow key={c.idCaisse}>
+                  <TableCell>{c.idCaisse}</TableCell>
+                  <TableCell>{c.region}</TableCell>
+                  <TableCell>{c.transporteur}</TableCell>
+                  <TableCell>{c.typeDeFonds}</TableCell>
+                  <TableCell>
+                    <Button
+                      size="small"
+                      onClick={() => {
+                        setCaisse(c);
+                        setEditId(c.idCaisse);
+                      }}
+                    >
+                      Modifier
+                    </Button>
+                    <Button
+                      size="small"
+                      color="error"
+                      onClick={() => handleOpenDialog(c.idCaisse)}
+                      sx={{ ml: 2 }}
+                    >
+                      Supprimer
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Paper>
+      </Box>
 
 						{/* Boîte de dialogue de confirmation */}
 						<Dialog open={openDialog} onClose={handleCloseDialog}>

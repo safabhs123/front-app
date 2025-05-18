@@ -51,7 +51,7 @@ const Authentification = () => {
 				} else if (role === "ADMIN_FUNCTIONAL") {
 					navigate("/controle-factures", { replace: true });
 				} else if (role === "EMPLOYEE") {
-					navigate("/accueil", { replace: true });
+					navigate("/acceuil", { replace: true });
 				} else {
 					setMessage("Rôle non reconnu");
 					setSeverity("error");
@@ -95,7 +95,7 @@ const Authentification = () => {
 			<div className="right-column">
 				<div className="logo-container">
 					<img
-						src="assetsss/logo/logo-1.jpg"
+						src="assetsss/logo/logo-full.png"
 						alt="Attijari Bank Logo"
 						width={120}
 						height={60}
@@ -116,7 +116,7 @@ const Authentification = () => {
 						</div>
 					)}
 
-					<form onSubmit={handleSubmit} className="login-form">
+					<form autoComplete="off"  onSubmit={handleSubmit} className="login-form">
 						<div className="form-group">
 							<input
 								type="text"
@@ -124,6 +124,7 @@ const Authentification = () => {
 								value={matricule}
 								onChange={(e) => setMatricule(e.target.value)}
 								placeholder="Adresse mail"
+                autoComplete="off" 
 								required
 								className="form-input"
 							/>
@@ -136,6 +137,7 @@ const Authentification = () => {
 								value={password}
 								onChange={(e) => setPassword(e.target.value)}
 								placeholder="Mot de passe"
+                  autoComplete="new-password"
 								required
 								className="form-input"
 							/>

@@ -75,6 +75,11 @@
 .sidebar.closed {
   width: var(--sidebar-width-closed);
 }
+.disabled-card {
+  pointer-events: none;
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 
 .sidebar-header {
   display: flex;

@@ -198,13 +198,16 @@ Période      : ${
 		}
 N° Facture   : ${facture.numero}
 
-| #  | Agence             | Date       | Nature du Passage     | Nb  | Résultat Passage | TRP   | TRT   | Total |
-|----|--------------------|------------|------------------------|-----|------------------|-------|-------|--------|
+| #   | Agence             | Date       | Nature du Passage     | Nb  | Résultat Passage | Collecte PqBDT | K°DV   | S°M.dt | Alimentation PqBDT | S°M.dt  | Remise KDV | Cout TRP | Cout TRT | Total |
+|-----|--------------------|------------|------------------------|-----|------------------|----------------|--------|--------|--------------------|--------|------------|----------|----------|-------|
+|     |                    |            |                        |     |                  | PqB.dt | K°DV   | S°M.dt | PqB.dt | S°M.dt | K°DV |
+|-----|--------------------|------------|------------------------|-----|------------------|--------|--------|--------|--------|--------|------|--------|----------|---------|
 ${lignesText}
-------------------------------------------------------------------------------------------
+--------------------------------------------------------------
+
+
 TOTAL HT : ${totalHT.toFixed(0)}
 ...
-
 TOTAL Collecte :
   - PqB.dt : ${Number(totalCollectePqBDT).toLocaleString("fr-FR", {
 		minimumFractionDigits: 0,
@@ -302,81 +305,124 @@ TOTAL Remise :
 	};
 
 	const exportPDF = () => {
-		if (!factureFormattee) {
-			alert("La facture doit être générée avant l'exportation.");
-			return;
-		}
-
 		const doc = new jsPDF();
 		doc.setFontSize(12);
-		doc.text(`Facture Transporteur - ${region}`, 14, 10);
-		doc.text(`Transporteur : ${facture.transporteur}`, 14, 18);
-		doc.text(`Date facture : ${facture.dateFacture}`, 14, 26);
-		doc.text(`N° Facture   : ${facture.numero}`, 14, 34);
-
-		const rows = facture.lignes.map((ligne, i) => [
-			i + 1,
-			ligne.agence,
-			ligne.date,
-			ligne.naturePassage,
-			ligne.nbPassages,
-			ligne.resultatPassage,
-			ligne.coutTRP,
-			ligne.coutTRT,
-			ligne.totalHT,
-		]);
-
+		doc.text(`Facture Transporteur - ${facture.transporteur}`, 14, 15);
+		doc.text(`Date facture : ${facture.dateFacture}`, 14, 22);
+		doc.text(`Période : ${facture.periode === 'MENSUELLE' ? facture.moisAnnee : facture.dateDebut + ' à ' + facture.dateFin}`, 14, 29);
+		doc.text(`N° Facture : ${facture.numero}`, 14, 36);
+	  
+		const columns = [
+		  "#", "Agence", "Date", "Nature Passage", "Nb", "Résultat Passage",
+		  "Coll. PqB.dt", "Coll. K°DV", "Coll. S°M.dt",
+		  "Alim. PqB.dt", "Alim. S°M.dt",
+		  "Remise K°DV",
+		  "Cout TRP", "Cout TRT", "Total"
+		];
+	  
+		const rows = facture.lignes.map((ligne, index) => ([
+		  index + 1,
+		  ligne.agence || "",
+		  ligne.date || "",
+		  ligne.naturePassage || "",
+		  ligne.nbPassages || 0,
+		  ligne.resultatPassage || "",
+		  ligne.collectePqBDT || 0,
+		  ligne.collecteKDV || 0,
+		  ligne.collecteSMDT || 0,
+		  ligne.alimentationPqBDT || 0,
+		  ligne.alimentationSMDT || 0,
+		  ligne.remiseKDV || 0,
+		  ligne.coutTRP || 0,
+		  ligne.coutTRT || 0,
+		  ligne.totalHT || 0
+		]));
+	  
+		// Calcul des totaux par colonne
+		const totalRow = [
+		  "", "", "", "Totaux",
+		  facture.lignes.reduce((sum, l) => sum + (parseFloat(l.nbPassages) || 0), 0),
+		  "",
+		  facture.lignes.reduce((sum, l) => sum + (parseFloat(l.collectePqBDT) || 0), 0),
+		  facture.lignes.reduce((sum, l) => sum + (parseFloat(l.collecteKDV) || 0), 0),
+		  facture.lignes.reduce((sum, l) => sum + (parseFloat(l.collecteSMDT) || 0), 0),
+		  facture.lignes.reduce((sum, l) => sum + (parseFloat(l.alimentationPqBDT) || 0), 0),
+		  facture.lignes.reduce((sum, l) => sum + (parseFloat(l.alimentationSMDT) || 0), 0),
+		  facture.lignes.reduce((sum, l) => sum + (parseFloat(l.remiseKDV) || 0), 0),
+		  facture.lignes.reduce((sum, l) => sum + (parseFloat(l.coutTRP) || 0), 0),
+		  facture.lignes.reduce((sum, l) => sum + (parseFloat(l.coutTRT) || 0), 0),
+		  facture.lignes.reduce((sum, l) => sum + (parseFloat(l.totalHT) || 0), 0)
+		];
+	  
 		autoTable(doc, {
-			startY: 42,
-			head: [
-				[
-					"#",
-					"Agence",
-					"Date",
-					"Nature",
-					"Nb",
-					"Résultat",
-					"TRP",
-					"TRT",
-					"Total",
-				],
-			],
-			body: rows,
+		  head: [columns],
+		  body: [...rows, totalRow],
+		  startY: 45,
+		  styles: { fontSize: 8, cellPadding: 2 },
+		  headStyles: { fillColor: [41, 128, 185], textColor: 255 },
+		  theme: 'grid',
+		  didDrawCell: (data) => {
+			// Optionnel : mettre les totaux en gras
+			if (data.row.index === rows.length && data.column.dataKey >= 4) {
+			  doc.setFont(undefined, 'bold');
+			}
+		  }
 		});
-
-		doc.save(`facture-${facture.numero}.pdf`);
-	};
-
-	const exportExcel = () => {
-		if (!factureFormattee) {
-			alert("La facture doit être générée avant l'exportation.");
-			return;
-		}
-
-		const worksheetData = facture.lignes.map((ligne, i) => ({
-			"#": i + 1,
-			Agence: ligne.agence,
-			Date: ligne.date,
-			"Nature du passage": ligne.naturePassage,
-			"Nb passages": ligne.nbPassages,
-			Résultat: ligne.resultatPassage,
-			"Coût TRP": ligne.coutTRP,
-			"Coût TRT": ligne.coutTRT,
-			"Total HT": ligne.totalHT,
-		}));
-
-		const worksheet = XLSX.utils.json_to_sheet(worksheetData);
-		const workbook = XLSX.utils.book_new();
-		XLSX.utils.book_append_sheet(workbook, worksheet, "Facture");
-
-		const excelBuffer = XLSX.write(workbook, {
-			bookType: "xlsx",
-			type: "array",
-		});
-		const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
-		saveAs(blob, `facture-${facture.numero}.xlsx`);
-	};
-
+	  
+		doc.save(`Facture_${facture.numero}.pdf`);
+	  };
+	  const exportExcel = () => {
+		const wb = XLSX.utils.book_new();
+	  
+		const columns = [
+		  "#", "Agence", "Date", "Nature Passage", "Nb", "Résultat Passage",
+		  "Coll. PqBDT", "Coll. K°DV", "Coll. S°M.dt",
+		  "Alim. PqBDT", "Alim. S°M.dt",
+		  "Remise KDV",
+		  "Cout TRP", "Cout TRT", "Total"
+		];
+	  
+		const rows = facture.lignes.map((ligne, index) => ([
+		  index + 1,
+		  ligne.agence || "",
+		  ligne.date || "",
+		  ligne.naturePassage || "",
+		  ligne.nbPassages || 0,
+		  ligne.resultatPassage || "",
+		  +(ligne.collectePqBDT || 0),
+		  +(ligne.collecteKDV || 0),
+		  +(ligne.collecteSMDT || 0),
+		  +(ligne.alimentationPqBDT || 0),
+		  +(ligne.alimentationSMDT || 0),
+		  +(ligne.remiseKDV || 0),
+		  +(ligne.coutTRP || 0),
+		  +(ligne.coutTRT || 0),
+		  +(ligne.totalHT || 0)
+		]));
+	  
+		const total = (key) =>
+		  facture.lignes.reduce((sum, l) => sum + (parseFloat(l[key]) || 0), 0).toFixed(2);
+	  
+		const totalRow = [
+		  "", "", "", "Totaux",
+		  total("nbPassages"), "",
+		  total("collectePqBDT"),
+		  total("collecteKDV"),
+		  total("collecteSMDT"),
+		  total("alimentationPqBDT"),
+		  total("alimentationSMDT"),
+		  total("remiseKDV"),
+		  total("coutTRP"),
+		  total("coutTRT"),
+		  total("totalHT")
+		];
+	  
+		const sheetData = [columns, ...rows, totalRow];
+		const ws = XLSX.utils.aoa_to_sheet(sheetData);
+	  
+		XLSX.utils.book_append_sheet(wb, ws, "Facture");
+		XLSX.writeFile(wb, `Facture_${facture.numero}.xlsx`);
+	  };
 	const exportFacture = () => {
 		if (!factureFormattee) {
 			alert("La facture doit être générée avant l'exportation.");
@@ -409,7 +455,7 @@ TOTAL Remise :
 				<nav className="sidebar-nav">
 					<ul>
 						<li>
-							<Link to="/accueil">
+							<Link to="/acceuil">
 								<Home size={20} />
 								<span>Tableau de bord</span>
 							</Link>
@@ -421,7 +467,7 @@ TOTAL Remise :
 							</Link>
 						</li>
 						<li>
-							<Link to="/caisse">
+							<Link to="/gerer-caisse">
 								<CreditCard size={20} />
 								<span>Caisse</span>
 							</Link>
@@ -432,6 +478,12 @@ TOTAL Remise :
 								<span>Rapports</span>
 							</Link>
 						</li>
+						{/* <li>
+													<Link to="/utilisateurs">
+														<CreditCard size={20} />
+														<span>GererUtilisateurs</span>
+													</Link>
+												</li> */}
 					</ul>
 				</nav>
 

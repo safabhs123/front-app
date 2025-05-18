@@ -22,10 +22,20 @@ import {
 } from "@mui/material";
 import axios from "../api/axiosConfig";
 import { useNavigate } from "react-router-dom";
+import "./utilisateurs.css";
 
 const Utilisateurs = () => {
 	const navigate = useNavigate();
 	const role = localStorage.getItem("role");
+	const toLocalISODate = (dateString) => {
+  const date = new Date(dateString);
+  const localISO = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+    .toISOString()
+    .split("T")[0];
+  return localISO;
+};
+
+
 
 	const [utilisateurs, setUtilisateurs] = useState([]);
 	const [utilisateur, setUtilisateur] = useState({
@@ -43,7 +53,7 @@ const Utilisateurs = () => {
 
 	useEffect(() => {
 		if (role !== "ADMIN_USER") {
-			navigate("/accueil");
+			navigate("/acceuil");
 		} else {
 			fetchUtilisateurs();
 		}
@@ -86,9 +96,13 @@ const Utilisateurs = () => {
 	const handleAddUser = async (e) => {
 		e.preventDefault();
 		try {
+			 const userToSend = {
+      ...utilisateur,
+      dateDebutTravail: toLocalISODate(utilisateur.dateDebutTravail),
+    };
 			const response = await axios.post(
 				"http://localhost:8080/api/utilisateur/add",
-				utilisateur
+				utilisateur,userToSend
 			);
 			console.log("Utilisateur ajouté", response.data);
 			fetchUtilisateurs();
@@ -101,9 +115,14 @@ const Utilisateurs = () => {
 	const handleUpdate = async (e) => {
 		e.preventDefault();
 		try {
+			
+		 const userToSend = {
+      ...utilisateur,
+      dateDebutTravail: toLocalISODate(utilisateur.dateDebutTravail),
+    };
 			const response = await axios.put(
 				`http://localhost:8080/api/utilisateur/update/${utilisateur.matricule}`,
-				utilisateur
+				utilisateur,userToSend
 			);
 			console.log("Utilisateur modifié", response.data);
 			fetchUtilisateurs();
@@ -146,6 +165,11 @@ const Utilisateurs = () => {
 		setOpenConfirm(false);
 		setUserToDelete(null);
 	};
+	function formatDate(dateStr) {
+  const [year, month, day] = dateStr.split("-");
+  return `${day}/${month}/${year}`;
+}
+
 
 	const resetForm = () => {
 		setUtilisateur({
@@ -162,7 +186,8 @@ const Utilisateurs = () => {
 
 	return (
 		<div style={{ padding: 30 }}>
-			<h2>Gestion des Utilisateurs</h2>
+			<h2>Gestion des Utilisateurs</h2><div className="header">Gestion des Utilisateurs - Attijari Bank</div>
+
 
 			<form
 				autoComplete="off"
@@ -186,7 +211,7 @@ const Utilisateurs = () => {
 					onChange={handleChange}
 					required
 					disabled={editMode}
-					autoComplete="new-password" // Utilisation d'un autre nom pour l'auto-completion
+					autoComplete="new-password" 
 					style={{ marginRight: 10 }}
 				/>
 
@@ -197,7 +222,7 @@ const Utilisateurs = () => {
 					onChange={handleChange}
 					required
 					disabled={editMode}
-					autoComplete="new-password" // Utilisation d'un autre nom pour l'auto-completion
+					autoComplete="new-password"
 					style={{ marginRight: 10 }}
 				/>
 
@@ -221,7 +246,7 @@ const Utilisateurs = () => {
 						value={utilisateur.password}
 						onChange={handleChange}
 						required
-						autoComplete="new-password" // Utilisation d'un autre nom pour l'auto-completion
+						autoComplete="new-password" 
 						style={{ marginRight: 10 }}
 					/>
 				)}
@@ -234,11 +259,11 @@ const Utilisateurs = () => {
 						value={utilisateur.role}
 						onChange={handleChange}
 					>
-						<FormControlLabel
+						{/* <FormControlLabel
 							value="ADMIN_USER"
 							control={<Radio />}
 							label="Admin-user"
-						/>
+						/> */}
 						<FormControlLabel
 							value="ADMIN_FUNCTIONAL"
 							control={<Radio />}
@@ -251,7 +276,7 @@ const Utilisateurs = () => {
 						/>
 					</RadioGroup>
 				</FormControl>
-
+				
 				<Button type="submit" variant="contained" color="primary">
 					{editMode ? "Modifier le Rôle" : "Ajouter"}
 				</Button>
@@ -267,6 +292,7 @@ const Utilisateurs = () => {
 			</form>
 
 			<TableContainer component={Paper}>
+			<div className="table-container">
 				<Table>
 					<TableHead>
 						<TableRow>
@@ -285,7 +311,14 @@ const Utilisateurs = () => {
 								<TableCell>{user.nom}</TableCell>
 								<TableCell>{user.prenom}</TableCell>
 								<TableCell>
-									{new Date(user.dateDebutTravail).toLocaleDateString()}
+<TableCell>
+  {user.dateDebutTravail
+    ? formatDate(user.dateDebutTravail)
+    : ""}
+</TableCell>
+
+
+
 								</TableCell>
 								<TableCell>{user.role}</TableCell>
 								<TableCell>
@@ -309,7 +342,10 @@ const Utilisateurs = () => {
 						))}
 					</TableBody>
 				</Table>
+			</div>	
 			</TableContainer>
+			<div className="footer">© 2025 Attijari Bank - Tous droits réservés</div>
+
 
 			<Dialog open={openConfirm} onClose={handleCancelDelete}>
 				<DialogTitle>Confirmer la suppression</DialogTitle>
@@ -328,6 +364,8 @@ const Utilisateurs = () => {
 				</DialogActions>
 			</Dialog>
 		</div>
+		
+
 	);
 };
 

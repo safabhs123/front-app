@@ -1,347 +1,291 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import "./Accueil.css"; // Import du CSS
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import axios from "axios";
 import {
-	Bell,
-	ChevronDown,
-	FileText,
-	Home,
-	LogOut,
-	Menu,
-	PieChart,
-	Search,
-	User,
-	X,
-	CreditCard,
-	Calendar,
-	DollarSign,
-	ArrowUpRight,
-	ArrowDownRight,
-	Clock,
+  Bell, ChevronDown, FileText, Home, LogOut, Menu,
+  PieChart, Search, User, X, CreditCard
 } from "lucide-react";
+import "./Acceuil.css";
+import "./Table.css";
+
 function Acceuil() {
-	const navigate = useNavigate();
+  const navigate = useNavigate();
+  const location = useLocation();
 
-	const [showProfil, setShowProfil] = useState(false);
-	const handleProfilClick = () => {
-		setShowProfil(!showProfil);
-	};
-	const [sidebarOpen, setSidebarOpen] = useState(true);
-	const [userName, setUserName] = useState("");
-	const [userRole, setUserRole] = useState("");
-	const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-	const [currentDate, setCurrentDate] = useState("");
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [userName, setUserName] = useState("");
+  const [role, setRole] = useState("");
+  const [currentDate, setCurrentDate] = useState("");
+  const [factures, setFactures] = useState([]);
+  const [activeTab, setActiveTab] = useState("");
+  const [facturesValide, setFacturesValide] = useState(0);
+  const [facturesNonValide, setFacturesNonValide] = useState(0);
+  const [totalMontantFacture, setTotalMontantFacture] = useState(0);
+useEffect(() => {
+  const storedRole = localStorage.getItem("role") || "";
+  setRole(storedRole);
+  console.log("Role:", storedRole); // Debug
 
-	useEffect(() => {
-		// Get user info from localStorage
-		const matricule = localStorage.getItem("matricule") || "";
-		const role = localStorage.getItem("role") || "";
 
-		setUserName(matricule);
-		setUserRole(role);
+    const options = { weekday: "long", year: "numeric", month: "long", day: "numeric" };
+    setCurrentDate(new Date().toLocaleDateString("fr-FR", options));
+  }, []);
 
-		// Format current date in French
-		const options = {
-			weekday: "long",
-			year: "numeric",
-			month: "long",
-			day: "numeric",
-		};
-		const today = new Date();
-		setCurrentDate(today.toLocaleDateString("fr-FR", options));
-	}, []);
+  useEffect(() => {
+    axios.get("http://localhost:8080/api/factures/statistiques")
+      .then(res => {
+        setFacturesValide(res.data.facturesValide);
+        setFacturesNonValide(res.data.facturesNonValide);
+        setTotalMontantFacture(res.data.totalMontantFacture);
+      })
+      .catch(err => {
+        console.error("Erreur lors de la récupération des statistiques :", err);
+      });
 
-	const toggleSidebar = () => {
-		setSidebarOpen(!sidebarOpen);
-	};
+    axios.get("http://localhost:8080/api/factures/comparaisons")
+      .then((res) => setFactures(res.data))
+      .catch((err) => console.error("Erreur de comparaison :", err));
+  }, []);
 
-	const toggleMobileMenu = () => {
-		setMobileMenuOpen(!mobileMenuOpen);
-	};
+  const displayName = userName.includes(" - ") ? userName.split(" - ")[1].trim() : userName;
 
-	const handleLogout = () => {
-		localStorage.clear();
-		navigate("/");
-	};
+  const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
+  const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen);
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate("/");
+  };
 
-	return (
-		<div className="dashboard-container">
-			{/* Sidebar */}
-			<aside className={`sidebar ${sidebarOpen ? "open" : "closed"}`}>
-				<div className="sidebar-header">
-					<img
-						src="assetsss/logo/logo-full.png"
-						alt="Attijari Bank Logo"
-						width={120}
-						height={60}
-						className="sidebar-logo"
-					/>
-					<button className="close-sidebar" onClick={toggleSidebar}>
-						<X size={20} />
-					</button>
-				</div>
+  return (
+    <div className="dashboard-container">
+      {/* Sidebar */}
+      <aside className={`sidebar ${sidebarOpen ? "open" : "closed"}`}>
+        <div className="sidebar-header">
+          <img src="assetsss/logo/logo-full.png" alt="Logo" width={120} height={60} className="sidebar-logo" />
+          <button className="close-sidebar" onClick={toggleSidebar}><X size={20} /></button>
+        </div>
 
-				<nav className="sidebar-nav">
-					<ul>
-						<li className="active">
-							<Link to="/acceuil">
-								<Home size={20} />
-								<span>Tableau de bord</span>
-							</Link>
-						</li>
-						<li>
-							<Link to="/controle-factures">
-								<FileText size={20} />
-								<span>Factures</span>
-							</Link>
-						</li>
-						<li>
-							<Link to="/caisse">
-								<CreditCard size={20} />
-								<span>Caisse</span>
-							</Link>
-						</li>
-						<li>
-							<Link to="/rapports">
-								<PieChart size={20} />
-								<span>Rapports</span>
-							</Link>
-						</li>
-					</ul>
-				</nav>
+        <nav className="sidebar-nav">
+          <ul>
+            {role === "ADMIN_USER" && (
+              <li>
+                <Link to="/utilisateurs"><CreditCard size={20} /><span>Gérer Utilisateurs</span></Link>
+              </li>
+            )}
+            {role === "ADMIN_FUNCTIONAL" && (
+              <>
+                <li className={activeTab === "acceuil" ? "active" : ""} onClick={() => setActiveTab("acceuil")}>
+                  <Link to="/acceuil"><Home size={20} /><span>Tableau de bord</span></Link>
+                </li>
+                <li className={activeTab === "factures" ? "active" : ""} onClick={() => setActiveTab("factures")}>
+                  <Link to="/controle-factures"><FileText size={20} /><span>Factures</span></Link>
+                </li>
+                <li className={activeTab === "gerer-caisse" ? "active" : ""} onClick={() => setActiveTab("gerer-caisse")}>
+                  <Link to="/gerer-caisse"><FileText size={20} /><span>Gerer Caisse</span></Link>
+                </li>
+                <li className={activeTab === "rapports" ? "active" : ""} onClick={() => setActiveTab("rapports")}>
+                  <Link to="/rapportcomparaison"><PieChart size={20} /><span>Rapports</span></Link>
+                </li>
+              </>
+            )}
+          </ul>
+        </nav>
 
-				<div className="sidebar-footer">
-					<button className="logout-button" onClick={handleLogout}>
-						<LogOut size={20} />
-						<span>Déconnexion</span>
-					</button>
-				</div>
-			</aside>
+        <div className="sidebar-footer">
+          <button className="logout-button" onClick={handleLogout}>
+            <LogOut size={20} /><span>Déconnexion</span>
+          </button>
+        </div>
+      </aside>
 
-			{/* Main Content */}
-			<main
-				className={`main-content ${
-					sidebarOpen ? "sidebar-open" : "sidebar-closed"
-				}`}
-			>
-				{/* Header */}
-				<header className="dashboard-header">
-					<div className="header-left">
-						<button className="menu-toggle" onClick={toggleSidebar}>
-							<Menu size={24} />
-						</button>
-						<div className="search-container">
-							<Search size={20} className="search-icon" />
-							<input
-								type="text"
-								placeholder="Rechercher..."
-								className="search-input"
-							/>
-						</div>
-					</div>
+      {/* Main content */}
+      <main className={`main-content ${sidebarOpen ? "sidebar-open" : "sidebar-closed"}`}>
+        <header className="dashboard-header">
+          <div className="header-left">
+            <button className="menu-toggle" onClick={toggleSidebar}><Menu size={24} /></button>
+            <div className="search-container">
+              <Search size={20} className="search-icon" />
+              <input type="text" placeholder="Rechercher..." className="search-input" />
+            </div>
+          </div>
 
-					<div className="header-right">
-						<button className="notification-button">
-							<Bell size={20} />
-							<span className="notification-badge">3</span>
-						</button>
+          <div className="header-right">
+            <button className="notification-button">
+              <Bell size={20} />
+              <span className="notification-badge">3</span>
+            </button>
 
-						<div className="user-menu">
-							<button className="user-menu-button" onClick={toggleMobileMenu}>
-								<div className="user-avatar">
-									<User size={20} />
-								</div>
-								<div className="user-info">
-									<span className="user-name">{userName}</span>
-									<span className="user-role">{userRole}</span>
-								</div>
-								<ChevronDown size={16} />
-							</button>
+            <div className="user-menu">
+              <button className="user-menu-button" onClick={toggleMobileMenu}>
+                <div className="user-avatar"><User size={20} /></div>
+                <div className="user-info">
+                  <span className="user-name">{displayName}</span>
+                  <span className="user-role">{role}</span>
+                </div>
+                <ChevronDown size={16} />
+              </button>
 
-							{mobileMenuOpen && (
-								<div className="user-dropdown">
-									<Link to="/profil" onClick={handleProfilClick}>
-										<User size={16} />
-										<span>Mon profil</span>
-									</Link>
+              {mobileMenuOpen && (
+                <div className="user-dropdown">
+                  <Link to="/profil"><User size={16} /><span>Mon profil</span></Link>
+                  <button onClick={handleLogout}>
+                    <LogOut size={16} /><span>Déconnexion</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </header>
 
-									<button onClick={handleLogout}>
-										<LogOut size={16} />
-										<span>Déconnexion</span>
-									</button>
-								</div>
-							)}
-						</div>
-					</div>
-				</header>
+        <div className="dashboard-content">
+          {role === "ADMIN_USER" ? (
+            <div className="p-8 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-700 text-white rounded-xl shadow-lg mx-4 my-6 border-l-4 border-blue-800">
+              <h2 className="text-3xl font-semibold">Bienvenue 👋</h2>
+              <p className="text-lg">
+                Vous êtes connecté en tant que <span className="text-yellow-400 font-medium">Administrateur des utilisateurs</span>.<br />
+                Accès aux factures non autorisé.
+              </p>
+            </div>
+          ) : (
+            <>
+              <div className="page-header">
+                <h1>Tableau de bord</h1>
+                <p className="date-display">{currentDate}</p>
+              </div>
 
-				{/* Dashboard Content */}
-				<div className="dashboard-content">
-					<div className="page-header">
-						<div>
-							<h1>Tableau de bord</h1>
-							<p className="date-display">{currentDate}</p>
-						</div>
-					</div>
+              <div className="content-section" style={{ marginTop: "30px" }}>
+                <h2>Statistiques des factures</h2>
+                <div className="quick-actions" style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
+                  <div style={{ padding: "15px", backgroundColor: "#e8f5e9", borderRadius: "10px", flex: "1 1 30%" }}>
+                    <h3>Factures validées</h3>
+                    <p style={{ fontSize: "1.8rem", fontWeight: "bold" }}>{facturesValide}</p>
+                  </div>
+                  <div style={{ padding: "15px", backgroundColor: "#ffebee", borderRadius: "10px", flex: "1 1 30%" }}>
+                    <h3>Factures non validées</h3>
+                    <p style={{ fontSize: "1.8rem", fontWeight: "bold" }}>{facturesNonValide}</p>
+                  </div>
+                  <div style={{ padding: "15px", backgroundColor: "#e3f2fd", borderRadius: "10px", flex: "1 1 30%" }}>
+                    <h3>Montant total</h3>
+                    <p style={{ fontSize: "1.8rem", fontWeight: "bold" }}>{totalMontantFacture.toFixed(3)} TND</p>
+                  </div>
+                </div>
+              </div>
 
-					{/* Stats Cards */}
-					<div className="stats-grid">
-						<div className="stats-card">
-							<div className="stats-card-header">
-								<h3>Total des factures</h3>
-								<div className="stats-icon blue">
-									<FileText size={20} />
-								</div>
-							</div>
-							<div className="stats-card-content">
-								<p className="stats-value">1,254</p>
-								<div className="stats-trend positive">
-									<ArrowUpRight size={16} />
-									<span>+12.5%</span>
-								</div>
-							</div>
-							<p className="stats-period">Depuis le mois dernier</p>
-						</div>
+              <div style={{ padding: "20px", marginBottom: "30px" }}>
+                <h2>Résultat de comparaison</h2>
+                <table className="table">
+                  <thead>
+                    <tr>
+                      <th>Agence</th>
+                      <th>Date</th>
+                      <th>Nature</th>
+                      <th>Nombre de passages</th>
+                      <th>TRP</th>
+                      <th>TRT</th>
+                      <th>Validité</th>
+                      <th>Différences</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {factures.map((ligne, index) => {
+                      const agenceNom = ligne.ligneFacture?.agence?.nom || "—";
+                      const date = ligne.ligneFacture?.date || "—";
+                      const nature = ligne.ligneFacture?.naturePassage?.join(", ") || "—";
+                      const passages = ligne.ligneFacture?.nombrePassages || "—";
+                      const trp = ligne.ligneFacture?.coutTRP || "—";
+                      const trt = ligne.ligneFacture?.coutTRT || "—";
+                      const statut = ligne.valid ? "Valide" : "Non valide";
+                      const diff = ligne.differences || "—";
 
-						<div className="stats-card">
-							<div className="stats-card-header">
-								<h3>Montant total</h3>
-								<div className="stats-icon green">
-									<DollarSign size={20} />
-								</div>
-							</div>
-							<div className="stats-card-content">
-								<p className="stats-value">45,250 DT</p>
-								<div className="stats-trend positive">
-									<ArrowUpRight size={16} />
-									<span>+8.2%</span>
-								</div>
-							</div>
-							<p className="stats-period">Depuis le mois dernier</p>
-						</div>
+                      return (
+                        <tr key={index}>
+                          <td>{agenceNom}</td>
+                          <td>{date}</td>
+                          <td>{nature}</td>
+                          <td>{passages}</td>
+                          <td>{trp}</td>
+                          <td>{trt}</td>
+                          <td style={{ color: ligne.valid ? "green" : "red" }}>{statut}</td>
+                          <td>{diff}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+              {/* Actions rapides */}
+ {/* Actions rapides */}
+<div style={{ padding: "20px" }}>
+  <div className="content-section" style={{ marginTop: "30px" }}>
+    <div className="section-header" style={{ marginBottom: "20px" }}>
+      <h2>Actions rapides</h2>
+    </div>
+    <div className="quick-actions" style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
+      {[
+        {
+          title: "Nouvelle facture",
+          desc: "Créer une nouvelle facture",
+          bg: "#e0f7fa",
+          icon: <FileText size={24} />,
+          route: "/factures/nouvelle"
+        },
+        {
+          title: "Transaction caisse",
+          desc: "Effectuer une transaction en caisse",
+          bg: "#e8f5e9",
+          icon: <CreditCard size={24} />,
+          route: "/caisse/transaction"
+        },
+        {
+          title: "Voir les rapports",
+          desc: "Consulter les rapports générés",
+          bg: "#f3e5f5",
+          icon: <PieChart size={24} />,
+          route: "/rapportcomparaison"
+        }
+      ].map((action, index) => {
+        const isDisabled = role === "ADMIN_USER"; // Limite l'accès pour le rôle ADMIN_USER
+        return (
+          <div
+            key={index}
+            className="quick-action-card"
+            style={{
+              padding: "15px",
+              backgroundColor: action.bg,
+              borderRadius: "10px",
+              flex: "1 1 30%",
+              cursor: isDisabled ? "not-allowed" : "pointer",
+              opacity: isDisabled ? 0.5 : 1,
+              position: "relative"
+            }}
+            onClick={() => {
+              if (isDisabled) {
+                alert("Accès non autorisé pour votre rôle.");
+                return; // Empêche la navigation si le rôle est ADMIN_USER
+              }
+              navigate(action.route); // Permet la navigation si non désactivé
+            }}
+          >
+            <div className="quick-action-icon">{action.icon}</div>
+            <h3>{action.title}</h3>
+            <p>{action.desc}</p>
+          </div>
+);
 
-						<div className="stats-card">
-							<div className="stats-card-header">
-								<h3>Factures en attente</h3>
-								<div className="stats-icon orange">
-									<Clock size={20} />
-								</div>
-							</div>
-							<div className="stats-card-content">
-								<p className="stats-value">28</p>
-								<div className="stats-trend negative">
-									<ArrowDownRight size={16} />
-									<span>-3.1%</span>
-								</div>
-							</div>
-							<p className="stats-period">Depuis le mois dernier</p>
-						</div>
+      })}
+    </div>
+  </div>
+</div>
 
-						<div className="stats-card">
-							<div className="stats-card-header">
-								<h3>Transactions du jour</h3>
-								<div className="stats-icon purple">
-									<Calendar size={20} />
-								</div>
-							</div>
-							<div className="stats-card-content">
-								<p className="stats-value">32</p>
-								<div className="stats-trend positive">
-									<ArrowUpRight size={16} />
-									<span>+4.8%</span>
-								</div>
-							</div>
-							<p className="stats-period">Par rapport à hier</p>
-						</div>
-					</div>
-
-					{/* Recent Invoices */}
-					<div className="content-section">
-						<div className="section-header">
-							<h2>Factures récentes</h2>
-							<a href="/factures" className="view-all">
-								Voir tout
-							</a>
-						</div>
-
-						<div className="table-container">
-							<table className="data-table">
-								<thead>
-									<tr>
-										<th>N° Facture</th>
-										<th>Client</th>
-										<th>Date</th>
-										<th>Montant</th>
-										<th>Statut</th>
-										<th>Action</th>
-									</tr>
-								</thead>
-								<tbody>
-									<tr>
-										<td>FAC-2023-001</td>
-										<td>Société ABC</td>
-										<td>03/05/2023</td>
-										<td>1,250.00 DT</td>
-										<td>
-											<span className="status-badge paid">Payée</span>
-										</td>
-										<td>
-											<button className="action-button">Détails</button>
-										</td>
-									</tr>
-									<tr>
-										<td>FAC-2023-002</td>
-										<td>Entreprise XYZ</td>
-										<td>02/05/2023</td>
-										<td>3,450.75 DT</td>
-										<td>
-											<span className="status-badge pending">En attente</span>
-										</td>
-										<td>
-											<button className="action-button">D��tails</button>
-										</td>
-									</tr>
-								</tbody>
-							</table>
-						</div>
-					</div>
-
-					{/* Quick Actions */}
-					<div className="content-section">
-						<div className="section-header">
-							<h2>Actions rapides</h2>
-						</div>
-
-						<div className="quick-actions">
-							<a href="/factures/nouvelle" className="quick-action-card">
-								<div className="quick-action-icon">
-									<FileText size={24} />
-								</div>
-								<h3>Nouvelle facture</h3>
-								<p>Créer une nouvelle facture</p>
-							</a>
-
-							<a href="/caisse/transaction" className="quick-action-card">
-								<div className="quick-action-icon">
-									<CreditCard size={24} />
-								</div>
-								<h3>Transaction caisse</h3>
-								<p>Enregistrer une transaction</p>
-							</a>
-
-							<a href="/rapports/generer" className="quick-action-card">
-								<div className="quick-action-icon">
-									<PieChart size={24} />
-								</div>
-								<h3>Générer rapport</h3>
-								<p>Créer un nouveau rapport</p>
-							</a>
-						</div>
-					</div>
-				</div>
-			</main>
-		</div>
-	);
+</>
+            
+            
+          )}
+        </div>
+      </main>
+    </div>
+  );
 }
 
 export default Acceuil;
