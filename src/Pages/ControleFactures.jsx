@@ -15,17 +15,27 @@ import {
   X,
 } from  "lucide-react";
 import "./Controle-factures.css";
+import { useNavigate } from "react-router-dom";
+
 
 function ControleFactures() {
   // States pour les fichiers Excel et résultats
   const [fichierBanque, setFichierBanque] = useState(null);
   const [fichierTransporteur, setFichierTransporteur] = useState(null);
+  const [resultatsRapport, setResultatsRapport] = useState([]);
+  const navigate = useNavigate();
+
+
+   
   const [comparaisonResult, setComparaisonResult] = useState([]);
   const [loading, setLoading] = useState(false);
     const [selectedDetail, setSelectedDetail] = useState(null);
     const [transporteurDetailsMap, setTransporteurDetailsMap] = useState({}); 
 const [banqueDetailsMap, setBanqueDetailsMap] = useState({});
+const [data, setData] = useState([]);
 
+ const [banquefile, setbanquefile] = useState(null);
+  const [transportfile, settransportfile] = useState(null);
 
   // States pour sidebar et menu utilisateur
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -44,12 +54,17 @@ const [banqueDetailsMap, setBanqueDetailsMap] = useState({});
     alert("Déconnexion effectuée !");
   };
 
-  // Gestion des fichiers
-  const handleFileChange = (e, type) => {
-    const file = e.target.files[0];
-    if (type === "banque") setFichierBanque(file);
-    else setFichierTransporteur(file);
-  };
+ // Gestion des fichiers
+const handleFileChange = (e, type) => {
+  const file = e.target.files[0];
+  if (type === "banque") {
+    setFichierBanque(file);
+  } else if (type === "transporteur") {
+    setFichierTransporteur(file);
+  }
+};
+
+
   
 const fetchDetails = async (index) => {
   if (!fichierBanque || !fichierTransporteur) {
@@ -64,6 +79,7 @@ const fetchDetails = async (index) => {
     const banqueResponse = await axios.post("/api/details/banque", formDataBanque, {
       headers: { "Content-Type": "multipart/form-data" },
     });
+
 
     // Préparer formData transporteur
     const formDataTransport = new FormData();
@@ -89,6 +105,32 @@ const fetchDetails = async (index) => {
     alert("Erreur lors de la récupération des détails banque et transporteur.");
   }
 };
+
+
+const handleGenererRapport = async () => {
+  if (!fichierBanque || !fichierTransporteur) {
+    alert("Veuillez sélectionner les deux fichiers !");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("banque", fichierBanque);
+  formData.append("transport", fichierTransporteur);
+
+  try {
+    const response = await axios.post("http://localhost:8080/api/rapport/generer", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    navigate("/rapportpage", { state: { rapport: response.data } }); // 🔁 Redirection avec les données
+  } catch (error) {
+    console.error("Erreur lors de la génération du rapport", error);
+  }
+};
+
+
+
 
   // Envoi des fichiers et récupération des résultats
   const handleSubmit = async () => {
@@ -185,7 +227,7 @@ const toggleDetails = (index) => {
                   className={activeTab === "rapports" ? "active" : ""}
                   onClick={() => setActiveTab("rapports")}
                 >
-                  <Link to="/rapportcomparaison">
+                  <Link to="/rapportpage">
                     <PieChart size={20} />
                     <span>Rapports</span>
                   </Link>
@@ -274,12 +316,24 @@ const toggleDetails = (index) => {
       />
       </div>
        <br />
+
       <button
         onClick={handleSubmit}
         className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
       >
         Comparer
       </button>
+            
+             <br />
+             <br />
+
+      <button
+  onClick={handleGenererRapport}
+  className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+>
+  Générer Rapport
+</button>
+
     </div>
        <br />
 
@@ -297,6 +351,7 @@ const toggleDetails = (index) => {
             <th className="border p-2">Détails</th>
           </tr>
         </thead>
+        
         <tbody>
           {comparaisonResult.map((item, index) => (
             <React.Fragment key={index}>
@@ -396,6 +451,7 @@ const toggleDetails = (index) => {
                             ))}
                           </tbody>
                         </table>
+                        
                       ) : (
                         <p>Chargement des détails transporteur...</p>
                       )}
@@ -408,6 +464,8 @@ const toggleDetails = (index) => {
         </tbody>
       </table>
     )}
+    
+
 
     {!loading && comparaisonResult.length === 0 && (
       <p className="text-center text-gray-500 mt-4">Aucun résultat à afficher.</p>

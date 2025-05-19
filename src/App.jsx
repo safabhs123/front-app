@@ -12,7 +12,7 @@ import ControleFactures from "./Pages/ControleFactures";
 import Profil from "./Pages/Profil";
 import FormFacture from "./Pages/FormFacture";
 import OcrUploader from "./Pages/OcrUploader";
-import RapportComparaison from "./Pages/RapportComparaison";
+import RapportPage from "./Pages/RapportPage";
 function App() {
 	return (
 		<BrowserRouter>
@@ -22,7 +22,7 @@ function App() {
 				<Route path="/acceuil" element={<Acceuil />} />
 				<Route path="/profil" element={<Profil />} />
 				<Route path="/ocr" element={<OcrUploader />} />
-<Route path="/rapportcomparaison" element={<RapportComparaison />} />
+<Route path="/rapportpage" element={<RapportPage />} />
 				<Route path="/modifier-facture/:id" element={<ModifierFacture />} /> 
 
 				{/* <Route path="/facture" element={<Facture />} /> */}

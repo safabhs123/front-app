@@ -238,7 +238,7 @@ export default function GererCaisse() {
 							</Link>
 						</li>
 						<li>
-							<Link to="/rapportcomparaison">
+							<Link to="/rapportpage">
 								<PieChart size={20} />
 								<span>Rapports</span>
 							</Link>

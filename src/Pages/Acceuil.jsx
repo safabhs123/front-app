@@ -85,7 +85,7 @@ useEffect(() => {
                   <Link to="/gerer-caisse"><FileText size={20} /><span>Gerer Caisse</span></Link>
                 </li>
                 <li className={activeTab === "rapports" ? "active" : ""} onClick={() => setActiveTab("rapports")}>
-                  <Link to="/rapportcomparaison"><PieChart size={20} /><span>Rapports</span></Link>
+                  <Link to="/rapportpage"><PieChart size={20} /><span>Rapports</span></Link>
                 </li>
               </>
             )}
