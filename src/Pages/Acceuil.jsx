@@ -154,66 +154,8 @@ useEffect(() => {
                 <p className="date-display">{currentDate}</p>
               </div>
 
-              <div className="content-section" style={{ marginTop: "30px" }}>
-                <h2>Statistiques des factures</h2>
-                <div className="quick-actions" style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
-                  <div style={{ padding: "15px", backgroundColor: "#e8f5e9", borderRadius: "10px", flex: "1 1 30%" }}>
-                    <h3>Factures validées</h3>
-                    <p style={{ fontSize: "1.8rem", fontWeight: "bold" }}>{facturesValide}</p>
-                  </div>
-                  <div style={{ padding: "15px", backgroundColor: "#ffebee", borderRadius: "10px", flex: "1 1 30%" }}>
-                    <h3>Factures non validées</h3>
-                    <p style={{ fontSize: "1.8rem", fontWeight: "bold" }}>{facturesNonValide}</p>
-                  </div>
-                  <div style={{ padding: "15px", backgroundColor: "#e3f2fd", borderRadius: "10px", flex: "1 1 30%" }}>
-                    <h3>Montant total</h3>
-                    <p style={{ fontSize: "1.8rem", fontWeight: "bold" }}>{totalMontantFacture.toFixed(3)} TND</p>
-                  </div>
-                </div>
-              </div>
-
-              <div style={{ padding: "20px", marginBottom: "30px" }}>
-                <h2>Résultat de comparaison</h2>
-                <table className="table">
-                  <thead>
-                    <tr>
-                      <th>Agence</th>
-                      <th>Date</th>
-                      <th>Nature</th>
-                      <th>Nombre de passages</th>
-                      <th>TRP</th>
-                      <th>TRT</th>
-                      <th>Validité</th>
-                      <th>Différences</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {factures.map((ligne, index) => {
-                      const agenceNom = ligne.ligneFacture?.agence?.nom || "—";
-                      const date = ligne.ligneFacture?.date || "—";
-                      const nature = ligne.ligneFacture?.naturePassage?.join(", ") || "—";
-                      const passages = ligne.ligneFacture?.nombrePassages || "—";
-                      const trp = ligne.ligneFacture?.coutTRP || "—";
-                      const trt = ligne.ligneFacture?.coutTRT || "—";
-                      const statut = ligne.valid ? "Valide" : "Non valide";
-                      const diff = ligne.differences || "—";
-
-                      return (
-                        <tr key={index}>
-                          <td>{agenceNom}</td>
-                          <td>{date}</td>
-                          <td>{nature}</td>
-                          <td>{passages}</td>
-                          <td>{trp}</td>
-                          <td>{trt}</td>
-                          <td style={{ color: ligne.valid ? "green" : "red" }}>{statut}</td>
-                          <td>{diff}</td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+             
+             
               {/* Actions rapides */}
  {/* Actions rapides */}
 <div style={{ padding: "20px" }}>
@@ -224,15 +166,15 @@ useEffect(() => {
     <div className="quick-actions" style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
       {[
         {
-          title: "Nouvelle facture",
-          desc: "Créer une nouvelle facture",
+          title: "Factures validées",
+          desc: "Afficher Les factures valides ",
           bg: "#e0f7fa",
           icon: <FileText size={24} />,
           route: "/factures/nouvelle"
         },
         {
-          title: "Transaction caisse",
-          desc: "Effectuer une transaction en caisse",
+          title: "Factures non validées",
+          desc: "Afficher Les factures non valides",
           bg: "#e8f5e9",
           icon: <CreditCard size={24} />,
           route: "/caisse/transaction"
@@ -242,7 +184,7 @@ useEffect(() => {
           desc: "Consulter les rapports générés",
           bg: "#f3e5f5",
           icon: <PieChart size={24} />,
-          route: "/rapportcomparaison"
+          route: "/rapportpage"
         }
       ].map((action, index) => {
         const isDisabled = role === "ADMIN_USER"; // Limite l'accès pour le rôle ADMIN_USER

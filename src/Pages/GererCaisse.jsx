@@ -1,436 +1,239 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
-import {
-	FileText,
-	Home,
-	LogOut,
-	PieChart,
-	X,
-	CreditCard,
-	Menu,
-	ArrowLeft,
-} from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
-import "./GererCaisse.css";
-import {
-	Box,
-	Button,
-	Typography,
-	Paper,
-	InputLabel,
-	Select,
-	MenuItem,
-	TextField,
-	FormControl,
-	Dialog,
-	DialogTitle,
-	DialogContent,
-	DialogContentText,
-	DialogActions,Table,TableHead, TableRow, TableCell, TableBody 
-} from "@mui/material";
 
-export default function GererCaisse() {
-	const navigate = useNavigate();
+function ListeCaisses() {
+  const [caisses, setCaisses] = useState([]);
+  const [regions, setRegions] = useState([]);
+  const [transporteurs, setTransporteurs] = useState([]);
+  const [newCaisse, setNewCaisse] = useState({ id: "", regionId: "" });
+  const [editing, setEditing] = useState({ regionId: null, oldTransporteurId: null });
 
-	const [showProfil, setShowProfil] = useState(false);
-	const handleProfilClick = () => {
-		setShowProfil(!showProfil);
-	};
-	const [sidebarOpen, setSidebarOpen] = useState(true);
-	const [userName, setUserName] = useState("");
-	const [userRole, setUserRole] = useState("");
-	const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-	const [currentDate, setCurrentDate] = useState("");
+  useEffect(() => {
+    fetchCaisses();
+    fetch("/api/regions")
+      .then((res) => res.json())
+      .then((data) => setRegions(data));
+    fetch("/api/transporteurs")
+      .then((res) => res.json())
+      .then((data) => setTransporteurs(data));
+  }, []);
 
-	useEffect(() => {
-		// Get user info from localStorage
-		const matricule = localStorage.getItem("matricule") || "";
-		const role = localStorage.getItem("role") || "";
+  const fetchCaisses = () => {
+    fetch("/api/caisses")
+      .then((res) => res.json())
+      .then((data) => setCaisses(data));
+  };
 
-		setUserName(matricule);
-		setUserRole(role);
+  const handleAdd = () => {
+    if (!newCaisse.id || !newCaisse.regionId) return;
+    const region = regions.find((r) => r.id === parseInt(newCaisse.regionId));
+    fetch("/api/caisses", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: parseInt(newCaisse.id), region }),
+    }).then(() => {
+      setNewCaisse({ id: "", regionId: "" });
+      fetchCaisses();
+    });
+  };
 
-		// Format current date in French
-		const options = {
-			weekday: "long",
-			year: "numeric",
-			month: "long",
-			day: "numeric",
-		};
-		const today = new Date();
-		setCurrentDate(today.toLocaleDateString("fr-FR", options));
-	}, []);
+  const handleDelete = (id) => {
+    fetch(`/api/caisses/${id}`, { method: "DELETE" }).then(() => fetchCaisses());
+  };
 
-	const toggleSidebar = () => {
-		setSidebarOpen(!sidebarOpen);
-	};
+  const removeTransporteurFromRegion = (regionId, transporteurId) => {
+    fetch(`/api/regions/${regionId}/transporteurs/${transporteurId}`, {
+      method: "DELETE",
+    }).then(() => fetchCaisses());
+  };
 
-	const toggleMobileMenu = () => {
-		setMobileMenuOpen(!mobileMenuOpen);
-	};
+  const handleReplaceTransporteur = (regionId, oldTransporteurId, newTransporteurId) => {
+    if (!newTransporteurId) return;
+    fetch(`/api/regions/${regionId}/transporteurs`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ transporteurId: newTransporteurId }),
+    }).then(() => {
+      setEditing({ regionId: null, oldTransporteurId: null });
+      fetchCaisses();
+    });
+  };
 
-	const handleLogout = () => {
-		localStorage.clear();
-		navigate("/");
-	};
+  const addTransporteurToRegion = (regionId, transporteurId) => {
+    fetch(`/api/regions/${regionId}/transporteurs`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ transporteurId }),
+    }).then(() => {
+      setEditing({ regionId: null, oldTransporteurId: null });
+      fetchCaisses();
+    });
+  };
 
-	const [caisse, setCaisse] = useState({
-		idCaisse: "",
-		region: "",
-		transporteur: "",
-		typeDeFonds: "",
-	});
+  const startEditing = (regionId, oldTransporteurId) => {
+    setEditing({ regionId, oldTransporteurId });
+  };
 
-	const [openDialog, setOpenDialog] = useState(false);
-	const [selectedidCaisse, setselectedidCaisse] = useState(null);
-	const [caisses, setCaisses] = useState([]);
-	const [editId, setEditId] = useState(null);
-	const [regions, setRegions] = useState([]);
-	const [transporteurs, setTransporteurs] = useState([]);
-	const [typesDeFonds, setTypesDeFonds] = useState([]);
+  return (
+    <div className="p-6 max-w-5xl mx-auto font-sans">
+      <h1 className="text-3xl font-bold mb-6 text-gray-800">Gestion des Caisses</h1>
 
-	useEffect(() => {
-		axios
-			.get("http://localhost:8080/api/caisses/regions")
-			.then((res) => setRegions(res.data));
-		axios
-			.get("http://localhost:8080/api/caisses/transporteurs")
-			.then((res) => setTransporteurs(res.data));
-		axios
-			.get("http://localhost:8080/api/caisses/type-fonds")
-			.then((res) => setTypesDeFonds(res.data));
-		loadCaisses();
-		console.log("Régions disponibles :", regions);
-		console.log("Région actuelle dans caisse:", caisse.region);
-	}, []);
-	const loadCaisses = () => {
-		axios
-			.get("http://localhost:8080/api/caisses/all")
-			.then((res) => setCaisses(res.data));
-	};
+      <div className="mb-6 flex gap-4 items-center">
+        <input
+          type="number"
+          placeholder="ID Caisse"
+          value={newCaisse.id}
+          onChange={(e) => setNewCaisse({ ...newCaisse, id: e.target.value })}
+          className="border rounded p-2 w-32 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <select
+          value={newCaisse.regionId}
+          onChange={(e) => setNewCaisse({ ...newCaisse, regionId: e.target.value })}
+          className="border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="">-- Sélectionner une région --</option>
+          {regions.map((r) => (
+            <option key={r.id} value={r.id}>
+              {r.nom}
+            </option>
+          ))}
+        </select>
+        <button
+          onClick={handleAdd}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg shadow transition-all"
+        >
+          Ajouter
+        </button>
+      </div>
 
-	const handleChange = (e) => {
-		setCaisse({ ...caisse, [e.target.name]: e.target.value });
-	};
-
-	const handleAdd = () => {
-		console.log("Données envoyées :", caisse);
-
-		axios
-			.post("http://localhost:8080/api/caisses/add", caisse)
-			.then(() => {
-				loadCaisses();
-				setCaisse({
-					idCaisse: "",
-					region: "",
-					transporteur: "",
-					typeDeFonds: "",
-				});
-				setEditId(null);
-			})
-			.catch((error) => {
-				if (error.response) {
-					console.error("Erreur backend :", error.response.data); // 👈 ici on capture l’erreur réelle
-				} else {
-					console.error("Erreur inconnue :", error);
-				}
-			});
-	};
-
-	const handleEdit = () => {
-		axios
-			.put(`http://localhost:8080/api/caisses/update/${editId}`, caisse)
-			.then(() => {
-				loadCaisses();
-				setCaisse({
-					idCaisse: "",
-					region: "",
-					transporteur: "",
-					typeDeFonds: "",
-				});
-				setEditId(null);
-			})
-			.catch((err) => console.error("Error editing caisse: ", err));
-	};
-
-	const handleOpenDialog = (id) => {
-		setselectedidCaisse(id);
-		setOpenDialog(true);
-	};
-
-	const handleCloseDialog = () => {
-		setselectedidCaisse(null);
-		setOpenDialog(false);
-	};
-	const getRegionFromId = (idCaisse) => {
-		if (!idCaisse) return "";
-
-		const cleanedId = idCaisse.trim(); // Enlève les espaces
-		const prefix = cleanedId.substring(0, 5); // Prend les 5 premiers caractères
-
-		switch (prefix) {
-			case "00099":
-				return "Tunis";
-			case "00199":
-				return "Sousse";
-			case "00299":
-				return "Nabeul";
-			case "00399":
-				return "Sfax";
-			case "00499":
-				return "Gabes";
-			case "00599":
-				return "Gafsa";
-			case "00699":
-				return "Jendouba";
-			case "00799":
-				return "Medenin";
-			default:
-				return "Inconnue";
-		}
-	};
-	const confirmDelete = () => {
-		axios
-			.delete(`http://localhost:8080/api/caisses/delete/${selectedidCaisse}`)
-			.then(() => {
-				loadCaisses();
-				handleCloseDialog();
-			})
-			.catch((err) => console.error("Erreur suppression :", err));
-	};
-	const isEditing = editId !== null;
-
-	return (
-		<div className="dashboard-container">
-			{/* Sidebar */}
-			<aside className={`sidebar ${sidebarOpen ? "open" : "closed"}`}>
-				<div className="sidebar-header">
-					<img
-						src="/assetsss/logo/logo-full.png"
-						alt="Attijari Bank Logo"
-						width={120}
-						height={60}
-						className="sidebar-logo"
-					/>
-					<button className="close-sidebar" onClick={toggleSidebar}>
-						<X size={20} />
-					</button>
-				</div>
-
-				<nav className="sidebar-nav">
-					<ul>
-						<li>
-							<Link to="/acceuil">
-								<Home size={20} />
-								<span>Tableau de bord</span>
-							</Link>
-						</li>
-						<li className="active">
-							<Link to="/controle-factures">
-								<FileText size={20} />
-								<span>Factures</span>
-							</Link>
-						</li>
-						<li>
-							<Link to="/gerer-caisse">
-								<CreditCard size={20} />
-								<span>Caisse</span>
-							</Link>
-						</li>
-						<li>
-							<Link to="/rapportpage">
-								<PieChart size={20} />
-								<span>Rapports</span>
-							</Link>
-						</li>
-					</ul>
-				</nav>
-
-				<div className="sidebar-footer">
-					<button className="logout-button" onClick={handleLogout}>
-						<LogOut size={20} />
-						<span>Déconnexion</span>
-					</button>
-				</div>
-			</aside>
-
-			{/* Main Content */}
-			<main
-				className={`main-content ${
-					sidebarOpen ? "sidebar-open" : "sidebar-closed"
-				}`}
-			>
-				{/* Header */}
-				<header className="dashboard-header">
-					<div className="header-left">
-						<button className="menu-toggle" onClick={toggleSidebar}>
-							<Menu size={24} />
-						</button>
-						<Link to="/controle-factures" className="back-link">
-							<ArrowLeft size={20} />
-							<span>Retour aux factures</span>
-						</Link>
-					</div>
-
-					<div className="header-right">
-						<div className="user-info">
-							<span className="user-name">{userName}</span>
-							<span className="user-role">{userRole}</span>
-						</div>
-					</div>
-				</header>
-
-				{/* Dashboard Content */}
-				<div className="dashboard-content">
-					<Box p={3}>
-						<Box display="flex" gap={4}>
-							<Box flex={1}>
-								<Paper elevation={3} sx={{ p: 3 }}>
-									<Typography variant="h6" gutterBottom>
-										Ajouter / Modifier une Caisse
-									</Typography>
-
-									<TextField
-										fullWidth
-										label="ID Caisse"
-										name="idCaisse"
-										value={caisse.idCaisse}
-										onChange={(e) => {
-											const id = e.target.value;
-											if (!isEditing) {
-												setCaisse({
-													...caisse,
-													idCaisse: id,
-													region: getRegionFromId(id),
-												});
-											}
-										}}
-										InputProps={{ readOnly: isEditing }}
-										sx={{ mb: 2 }}
-									/>
-
-									<FormControl fullWidth sx={{ mb: 2 }}>
-										<TextField
-											label="Région"
-											name="region"
-											value={caisse.region}
-											InputProps={{ readOnly: isEditing }}
-											fullWidth
-										/>
-									</FormControl>
-
-									<FormControl fullWidth sx={{ mb: 2 }}>
-										<InputLabel>Transporteur</InputLabel>
-										<Select
-											name="transporteur"
-											value={caisse.transporteur}
-											onChange={handleChange}
-											label="Transporteur"
-										>
-											{transporteurs.map((t) => (
-												<MenuItem key={t} value={t}>
-													{t}
-												</MenuItem>
-											))}
-										</Select>
-									</FormControl>
-
-									<FormControl fullWidth sx={{ mb: 2 }}>
-										<InputLabel>Type de Fonds</InputLabel>
-										<Select
-											name="typeDeFonds"
-											value={caisse.typeDeFonds}
-											onChange={handleChange}
-											label="Type de Fonds"
-										>
-											{typesDeFonds.map((f) => (
-												<MenuItem key={f} value={f}>
-													{f}
-												</MenuItem>
-											))}
-										</Select>
-									</FormControl>
-
-									<Button
-										variant="contained"
-										onClick={editId ? handleEdit : handleAdd}
-									>
-										{editId ? "Modifier" : "Ajouter"}
-									</Button>
-								</Paper>
-							</Box>
-							</Box>
-							<Box flex={1} mr={2}>
-        <Typography variant="h6" gutterBottom>
-          Liste des Caisses
-        </Typography>
-        <Paper sx={{ p: 2, mb: 2 }}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>ID</TableCell>
-                <TableCell>Région</TableCell>
-                <TableCell>Transporteur</TableCell>
-                <TableCell>Type de Fonds</TableCell>
-                <TableCell>Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {caisses.map((c) => (
-                <TableRow key={c.idCaisse}>
-                  <TableCell>{c.idCaisse}</TableCell>
-                  <TableCell>{c.region}</TableCell>
-                  <TableCell>{c.transporteur}</TableCell>
-                  <TableCell>{c.typeDeFonds}</TableCell>
-                  <TableCell>
-                    <Button
-                      size="small"
-                      onClick={() => {
-                        setCaisse(c);
-                        setEditId(c.idCaisse);
-                      }}
-                    >
-                      Modifier
-                    </Button>
-                    <Button
-                      size="small"
-                      color="error"
-                      onClick={() => handleOpenDialog(c.idCaisse)}
-                      sx={{ ml: 2 }}
-                    >
-                      Supprimer
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </Paper>
-      </Box>
-
-						{/* Boîte de dialogue de confirmation */}
-						<Dialog open={openDialog} onClose={handleCloseDialog}>
-							<DialogTitle>Confirmer la suppression</DialogTitle>
-							<DialogContent>
-								<DialogContentText>
-									Êtes-vous sûr de vouloir supprimer cette caisse ? Cette action
-									est irréversible.
-								</DialogContentText>
-							</DialogContent>
-							<DialogActions>
-								<Button onClick={handleCloseDialog}>Annuler</Button>
-								<Button
-									onClick={confirmDelete}
-									color="error"
-									variant="contained"
-								>
-									Supprimer
-								</Button>
-							</DialogActions>
-						</Dialog>
-					</Box>
-				</div>
-			</main>
-		</div>
-	);
+      <table className="w-full border border-gray-300 shadow-sm text-sm">
+        <thead className="bg-gray-100 text-left text-gray-700">
+          <tr>
+            <th className="border px-4 py-3">ID Caisse</th>
+            <th className="border px-4 py-3">Région</th>
+            <th className="border px-4 py-3">Transporteurs</th>
+            <th className="border px-4 py-3 text-center">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {caisses.map((caisse) => (
+            <tr key={caisse.id} className="hover:bg-gray-50">
+              <td className="border px-4 py-3">{caisse.id}</td>
+              <td className="border px-4 py-3">{caisse.region ? caisse.region.nom : "Non liée"}</td>
+              <td className="border px-4 py-3 min-w-[250px]">
+                {caisse.region ? (
+                  (caisse.region.transporteurs ?? []).length > 0 ? (
+                    caisse.region.transporteurs.map((t) => (
+                      <div key={t.id} className="flex items-center justify-between my-1">
+                        <span className="font-medium">{t.nom}</span>
+                        {editing.regionId === caisse.region.id &&
+                        editing.oldTransporteurId === t.id ? (
+                          <select
+                            autoFocus
+                            onBlur={() => setEditing({ regionId: null, oldTransporteurId: null })}
+                            onChange={(e) =>
+                              handleReplaceTransporteur(
+                                caisse.region.id,
+                                t.id,
+                                parseInt(e.target.value)
+                              )
+                            }
+                            className="border rounded p-1 text-sm"
+                            defaultValue=""
+                          >
+                            <option value="">-- Choisir --</option>
+                            {transporteurs
+                              .filter(
+                                (tr) =>
+                                  !(caisse.region.transporteurs ?? []).some(
+                                    (r) => r.id === tr.id
+                                  )
+                              )
+                              .map((tr) => (
+                                <option key={tr.id} value={tr.id}>
+                                  {tr.nom}
+                                </option>
+                              ))}
+                          </select>
+                        ) : (
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => startEditing(caisse.region.id, t.id)}
+                              className="text-yellow-600 hover:text-yellow-700 transition"
+                              title="Modifier transporteur"
+                            >
+                              ✏️
+                            </button>
+                            <button
+                              onClick={() => removeTransporteurFromRegion(caisse.region.id, t.id)}
+                              className="text-red-600 hover:text-red-700 transition"
+                              title="Supprimer transporteur"
+                            >
+                              ❌
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    ))
+                  ) : (
+                    <div className="flex items-center gap-3">
+                      <span className="italic text-gray-500">Aucun transporteur</span>
+                      {editing.regionId === caisse.region.id &&
+                      editing.oldTransporteurId === null ? (
+                        <select
+                          autoFocus
+                          onBlur={() => setEditing({ regionId: null, oldTransporteurId: null })}
+                          onChange={(e) => {
+                            const newId = parseInt(e.target.value);
+                            if (newId) {
+                              addTransporteurToRegion(caisse.region.id, newId);
+                            }
+                          }}
+                          className="border rounded p-1 text-sm ml-2"
+                          defaultValue=""
+                        >
+                          <option value="">-- Ajouter transporteur --</option>
+                          {transporteurs
+                            .filter(
+                              (tr) =>
+                                !(caisse.region.transporteurs ?? []).some(
+                                  (r) => r.id === tr.id
+                                )
+                            )
+                            .map((tr) => (
+                              <option key={tr.id} value={tr.id}>
+                                {tr.nom}
+                              </option>
+                            ))}
+                        </select>
+                      ) : (
+                        <button
+                          onClick={() => setEditing({ regionId: caisse.region.id, oldTransporteurId: null })}
+                          className="text-green-600 hover:text-green-700 font-semibold transition"
+                          title="Ajouter un transporteur"
+                        >
+                          ➕ Ajouter
+                        </button>
+                      )}
+                    </div>
+                  )
+                ) : (
+                  "Non liée"
+                )}
+              </td>
+              <td className="border px-4 py-3 text-center">
+                <button
+                  onClick={() => handleDelete(caisse.id)}
+                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-1 rounded-lg shadow text-sm transition"
+                >
+                  Supprimer
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
 }
+
+export default ListeCaisses;
