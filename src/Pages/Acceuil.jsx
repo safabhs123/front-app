@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import axios from "axios";
 import {
   Bell, ChevronDown, FileText, Home, LogOut, Menu,
   PieChart, Search, User, X, CreditCard
@@ -12,41 +11,50 @@ function Acceuil() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userName, setUserName] = useState("");
   const [role, setRole] = useState("");
   const [currentDate, setCurrentDate] = useState("");
-  const [factures, setFactures] = useState([]);
-  const [activeTab, setActiveTab] = useState("");
-  const [facturesValide, setFacturesValide] = useState(0);
-  const [facturesNonValide, setFacturesNonValide] = useState(0);
-  const [totalMontantFacture, setTotalMontantFacture] = useState(0);
-useEffect(() => {
-  const storedRole = localStorage.getItem("role") || "";
-  setRole(storedRole);
-  console.log("Role:", storedRole); // Debug
 
+  const [caisses, setCaisses] = useState([]);
+  const [regions, setRegions] = useState([]);
+  const [transporteurs, setTransporteurs] = useState([]);
+
+  const [activeTab, setActiveTab] = useState("");
+
+  useEffect(() => {
+    const storedRole = localStorage.getItem("role") || "";
+    setRole(storedRole);
 
     const options = { weekday: "long", year: "numeric", month: "long", day: "numeric" };
     setCurrentDate(new Date().toLocaleDateString("fr-FR", options));
+
+    fetchCaisses();
+    fetchRegions();
+    fetchTransporteurs();
   }, []);
 
-  useEffect(() => {
-    axios.get("http://localhost:8080/api/factures/statistiques")
-      .then(res => {
-        setFacturesValide(res.data.facturesValide);
-        setFacturesNonValide(res.data.facturesNonValide);
-        setTotalMontantFacture(res.data.totalMontantFacture);
-      })
-      .catch(err => {
-        console.error("Erreur lors de la récupération des statistiques :", err);
-      });
+  const fetchCaisses = () => {
+    fetch("/api/caisses")
+      .then((res) => res.json())
+      .then((data) => setCaisses(data))
+      .catch((err) => console.error("Erreur lors du chargement des caisses:", err));
+  };
 
-    axios.get("http://localhost:8080/api/factures/comparaisons")
-      .then((res) => setFactures(res.data))
-      .catch((err) => console.error("Erreur de comparaison :", err));
-  }, []);
+  const fetchRegions = () => {
+    fetch("/api/regions")
+      .then((res) => res.json())
+      .then((data) => setRegions(data))
+      .catch((err) => console.error("Erreur lors du chargement des régions:", err));
+  };
+
+  const fetchTransporteurs = () => {
+    fetch("/api/transporteurs")
+      .then((res) => res.json())
+      .then((data) => setTransporteurs(data))
+      .catch((err) => console.error("Erreur lors du chargement des transporteurs:", err));
+  };
 
   const displayName = userName.includes(" - ") ? userName.split(" - ")[1].trim() : userName;
 
@@ -58,7 +66,7 @@ useEffect(() => {
   };
 
   return (
-    <div className="dashboard-container">
+    <div className="">
       {/* Sidebar */}
       <aside className={`sidebar ${sidebarOpen ? "open" : "closed"}`}>
         <div className="sidebar-header">
@@ -82,10 +90,7 @@ useEffect(() => {
                   <Link to="/controle-factures"><FileText size={20} /><span>Factures</span></Link>
                 </li>
                 <li className={activeTab === "gerer-caisse" ? "active" : ""} onClick={() => setActiveTab("gerer-caisse")}>
-                  <Link to="/gerer-caisse"><FileText size={20} /><span>Gerer Caisse</span></Link>
-                </li>
-                <li className={activeTab === "rapports" ? "active" : ""} onClick={() => setActiveTab("rapports")}>
-                  <Link to="/rapportpage"><PieChart size={20} /><span>Rapports</span></Link>
+                  <Link to="/gerer-caisse"><FileText size={20} /><span>Gérer Caisse</span></Link>
                 </li>
               </>
             )}
@@ -104,18 +109,9 @@ useEffect(() => {
         <header className="dashboard-header">
           <div className="header-left">
             <button className="menu-toggle" onClick={toggleSidebar}><Menu size={24} /></button>
-            <div className="search-container">
-              <Search size={20} className="search-icon" />
-              <input type="text" placeholder="Rechercher..." className="search-input" />
-            </div>
           </div>
 
           <div className="header-right">
-            <button className="notification-button">
-              <Bell size={20} />
-              <span className="notification-badge">3</span>
-            </button>
-
             <div className="user-menu">
               <button className="user-menu-button" onClick={toggleMobileMenu}>
                 <div className="user-avatar"><User size={20} /></div>
@@ -154,75 +150,68 @@ useEffect(() => {
                 <p className="date-display">{currentDate}</p>
               </div>
 
-             
-             
-              {/* Actions rapides */}
- {/* Actions rapides */}
-<div style={{ padding: "20px" }}>
-  <div className="content-section" style={{ marginTop: "30px" }}>
-    <div className="section-header" style={{ marginBottom: "20px" }}>
-      <h2>Actions rapides</h2>
-    </div>
-    <div className="quick-actions" style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
-      {[
-        {
-          title: "Factures validées",
-          desc: "Afficher Les factures valides ",
-          bg: "#e0f7fa",
-          icon: <FileText size={24} />,
-          route: "/factures/nouvelle"
-        },
-        {
-          title: "Factures non validées",
-          desc: "Afficher Les factures non valides",
-          bg: "#e8f5e9",
-          icon: <CreditCard size={24} />,
-          route: "/caisse/transaction"
-        },
-        {
-          title: "Voir les rapports",
-          desc: "Consulter les rapports générés",
-          bg: "#f3e5f5",
-          icon: <PieChart size={24} />,
-          route: "/rapportpage"
-        }
-      ].map((action, index) => {
-        const isDisabled = role === "ADMIN_USER"; // Limite l'accès pour le rôle ADMIN_USER
-        return (
-          <div
-            key={index}
-            className="quick-action-card"
-            style={{
-              padding: "15px",
-              backgroundColor: action.bg,
-              borderRadius: "10px",
-              flex: "1 1 30%",
-              cursor: isDisabled ? "not-allowed" : "pointer",
-              opacity: isDisabled ? 0.5 : 1,
-              position: "relative"
-            }}
-            onClick={() => {
-              if (isDisabled) {
-                alert("Accès non autorisé pour votre rôle.");
-                return; // Empêche la navigation si le rôle est ADMIN_USER
-              }
-              navigate(action.route); // Permet la navigation si non désactivé
-            }}
-          >
-            <div className="quick-action-icon">{action.icon}</div>
-            <h3>{action.title}</h3>
-            <p>{action.desc}</p>
-          </div>
-);
-
-      })}
-    </div>
-  </div>
-</div>
-
-</>
-            
-            
+              {/* Stats */}
+              <div style={{ padding: "20px" }}>
+                <div className="content-section" style={{ marginTop: "30px" }}>
+                  <div className="section-header" style={{ marginBottom: "20px" }}>
+                    <h2>Stats</h2>
+                  </div>
+                  <div className="quick-actions" style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
+                    {[
+                      {
+                        title: "Nombre de Caisses",
+                        desc: `${caisses.length} caisses`,
+                        bg: "#e0f7fa",
+                        icon: <FileText size={24} />,
+                        route: "/gerer-caisse"
+                      },
+                      {
+                        title: "Nombre de Transporteurs",
+                        desc: `${transporteurs.length} transporteurs`,
+                        bg: "#e8f5e9",
+                        icon: <CreditCard size={24} />,
+                        route: "/gerer-caisse"
+                      },
+                      {
+                        title: "Nombre de Régions",
+                        desc: `${regions.length} régions`,
+                        bg: "#f3e5f5",
+                        icon: <PieChart size={24} />,
+                        route: "/gerer-caisse"
+                      }
+                    ].map((action, index) => {
+                      const isDisabled = role === "ADMIN_USER";
+                      return (
+                        <div
+                          key={index}
+                          className="quick-action-card"
+                          style={{
+                            padding: "15px",
+                            backgroundColor: action.bg,
+                            borderRadius: "10px",
+                            flex: "1 1 30%",
+                            cursor: isDisabled ? "not-allowed" : "pointer",
+                            opacity: isDisabled ? 0.5 : 1,
+                            position: "relative"
+                          }}
+                          onClick={() => {
+                            if (isDisabled) {
+                              alert("Accès non autorisé pour votre rôle.");
+                              return;
+                            }
+                            navigate(action.route);
+                          }}
+                        >
+                          <div className="quick-action-icon">{action.icon}</div>
+                          <h3>{action.title}</h3>
+                          <p>{action.desc}</p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </>
           )}
         </div>
       </main>

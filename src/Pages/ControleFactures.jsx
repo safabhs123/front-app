@@ -1,198 +1,176 @@
-import React, { useState } from "react";
-import axios from "axios";
-import { Link, useNavigate } from "react-router-dom";
-import {
-  CreditCard,
-  Home,
-  FileText,
-  PieChart,
-  LogOut,
-  Menu,
-  Search,
-  Bell,
-  User,
-  ChevronDown,
-  X,
-} from "lucide-react";
-import "./Controle-factures.css";
+"use client"
+
+import React from "react"
+
+import { useState, useEffect } from "react"
+import { Menu, X, Home, FileText, CreditCard, PieChart, LogOut, User, ChevronDown } from "lucide-react"
+import { useNavigate, Link } from "react-router-dom"
+import axios from "axios"
+import "./Controle-factures.css"
+import RapportModalBootstrap from "./RapportModalBootstrap"
 
 function ControleFactures() {
-  const [fichierBanque, setFichierBanque] = useState(null);
-  const [fichierTransporteur, setFichierTransporteur] = useState(null);
-  const [comparaisonResult, setComparaisonResult] = useState([]);
-  const [selectedDetailIndex, setSelectedDetailIndex] = useState(null);
- const [detailsBanque, setDetailsBanque] = useState([]);
-const [detailsTransport, setDetailsTransport] = useState([]);
+  const navigate = useNavigate()
+  const role = localStorage.getItem("role") || "ADMIN_FUNCTIONAL"
+  const displayName = localStorage.getItem("displayName") || "Utilisateur"
 
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("factures");
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(null);
+  // Dashboard states
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [activeTab, setActiveTab] = useState("factures")
 
+  // Invoice control states
+  const [fichierBanque, setFichierBanque] = useState(null)
+  const [fichierTransporteur, setFichierTransporteur] = useState(null)
+  const [comparaisonResult, setComparaisonResult] = useState([])
+  const [selectedDetailIndex, setSelectedDetailIndex] = useState(null)
+  const [detailsBanque, setDetailsBanque] = useState([])
+  const [detailsTransport, setDetailsTransport] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [selectedDate, setSelectedDate] = useState(null)
 
-  const navigate = useNavigate();
-  const role = "ADMIN_FUNCTIONAL"; // remplacer dynamiquement si besoin
-const formatDateFR = (dateStr) => {
-  console.log("welcome from formatDateFR:");
-  console.log("date:", dateStr);
+  useEffect(() => {
+    if (role !== "ADMIN_FUNCTIONAL") {
+      navigate("/acceuil")
+    }
+  }, [role, navigate])
 
-  if (!dateStr) return "";
-
-  const [year, month, day] = dateStr.split("-").map(Number);
-  const d = new Date(year, month - 1, day); // mois = 0-indexed
-  console.log("manually constructed Date:", d);
-
-  return d.toLocaleDateString("fr-FR"); // "28/02/2025"
-};
-
-
-  const handleFileChange = (e, type) => {
-    const file = e.target.files[0];
-    if (type === "banque") setFichierBanque(file);
-    else if (type === "transporteur") setFichierTransporteur(file);
-  };
-
+  // Dashboard functions
   const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
-  };
+    setSidebarOpen(!sidebarOpen)
+  }
 
   const toggleMobileMenu = () => {
-    setMobileMenuOpen(!mobileMenuOpen);
-  };
+    setMobileMenuOpen(!mobileMenuOpen)
+  }
 
   const handleLogout = () => {
-    // implémenter la déconnexion
-    navigate("/");
-  };
+    localStorage.removeItem("role")
+    localStorage.removeItem("displayName")
+    localStorage.removeItem("token")
+    navigate("/", { replace: true })
+  }
+
+  // Invoice control functions
+  const formatDateFR = (dateStr) => {
+    console.log("welcome from formatDateFR:")
+    console.log("date:", dateStr)
+
+    if (!dateStr) return ""
+
+    const [year, month, day] = dateStr.split("-").map(Number)
+    const d = new Date(year, month - 1, day)
+    console.log("manually constructed Date:", d)
+
+    return d.toLocaleDateString("fr-FR")
+  }
+
+  const handleFileChange = (e, type) => {
+    const file = e.target.files[0]
+    if (type === "banque") setFichierBanque(file)
+    else if (type === "transporteur") setFichierTransporteur(file)
+  }
 
   const handleSubmit = async () => {
     if (!fichierBanque || !fichierTransporteur) {
-      alert("Veuillez sélectionner les deux fichiers.");
-      return;
+      alert("Veuillez sélectionner les deux fichiers.")
+      return
     }
 
-    setLoading(true);
-    const formData = new FormData();
-    formData.append("fichierBanque", fichierBanque);
-    formData.append("fichierTransporteur", fichierTransporteur);
+    setLoading(true)
+    const formData = new FormData()
+    formData.append("fichierBanque", fichierBanque)
+    formData.append("fichierTransporteur", fichierTransporteur)
 
     try {
       const response = await axios.post("/api/comparaison/upload", formData, {
         headers: { "Content-Type": "multipart/form-data" },
-      });
-      setComparaisonResult(response.data);
+      })
+      setComparaisonResult(response.data)
     } catch (error) {
-      console.error("Erreur lors de la comparaison :", error);
-      alert("Erreur lors de la comparaison des fichiers.");
+      console.error("Erreur lors de la comparaison :", error)
+      alert("Erreur lors de la comparaison des fichiers.")
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
+
   const handleVoirDetails = async (index, date) => {
-    console.log(index , date);
-    
-     const formattedDate = formatDateFR(date);
-     console.log(" formattedDate : ",formattedDate)
-  // Toggle : si on clique sur le même index et la même date → on masque
-  if (selectedDetailIndex === index && selectedDate === date) {
-    setSelectedDetailIndex(null);
-    setSelectedDate(null);
-    setDetailsBanque([]);
-    setDetailsTransport([]);
-    return;
+    console.log(index, date)
+
+    const formattedDate = formatDateFR(date)
+    console.log(" formattedDate : ", formattedDate)
+
+    if (selectedDetailIndex === index && selectedDate === date) {
+      setSelectedDetailIndex(null)
+      setSelectedDate(null)
+      setDetailsBanque([])
+      setDetailsTransport([])
+      return
+    }
+
+    setSelectedDetailIndex(index)
+    setSelectedDate(formattedDate)
+
+    if (!fichierBanque || !fichierTransporteur) {
+      alert("Veuillez sélectionner les fichiers.")
+      return
+    }
+
+    try {
+      const formDataBanque = new FormData()
+      formDataBanque.append("file", fichierBanque)
+
+      const formDataTransport = new FormData()
+      formDataTransport.append("file", fichierTransporteur)
+
+      await Promise.all([
+        axios.post("http://localhost:8080/api/details/banque/upload", formDataBanque),
+        axios.post("http://localhost:8080/api/details/transport/upload", formDataTransport),
+      ])
+
+      const [resBanque, resTransport] = await Promise.all([
+        axios.get("http://localhost:8080/api/details/banque", {
+          params: { date: formattedDate },
+        }),
+        axios.get("http://localhost:8080/api/details/transport", {
+          params: { date: formattedDate },
+        }),
+      ])
+
+      setDetailsBanque(resBanque.data)
+      setDetailsTransport(resTransport.data)
+    } catch (error) {
+      console.error("Erreur lors du chargement des détails:", error)
+      alert("Erreur lors du chargement des détails.")
+    }
   }
 
-  setSelectedDetailIndex(index);
-  setSelectedDate(formattedDate);
- 
-  if (!fichierBanque || !fichierTransporteur) {
-    alert("Veuillez sélectionner les fichiers.");
-    return;
-  }
+const [rapport, setRapport] = useState([]);
 
-  try {
-    const formDataBanque = new FormData();
-    formDataBanque.append("file", fichierBanque);
-
-    const formDataTransport = new FormData();
-    formDataTransport.append("file", fichierTransporteur);
-
-    await Promise.all([
-      axios.post("http://localhost:8080/api/details/banque/upload", formDataBanque),
-      axios.post("http://localhost:8080/api/details/transport/upload", formDataTransport),
-    ]);
-
-    // const dateObj = new Date(date);
-    // const formattedDate = dateObj.toLocaleDateString("fr-FR");
-
-
-    const [resBanque, resTransport] = await Promise.all([
-      axios.get("http://localhost:8080/api/details/banque", {
-        params: { date: formattedDate },
-      }),
-      axios.get("http://localhost:8080/api/details/transport", {
-        params: { date: formattedDate },
-      }),
-    ]);
-
-    setDetailsBanque(resBanque.data);
-    setDetailsTransport(resTransport.data);
-  } catch (error) {
-    console.error("Erreur lors du chargement des détails:", error);
-    alert("Erreur lors du chargement des détails.");
-  }
-  
-};
-
-
-// const handleVoirDetails = async ( date) => {
+// const handleGenererRapport = async () => {
 //   if (!fichierBanque || !fichierTransporteur) {
-//     alert("Veuillez sélectionner les fichiers.");
+//     alert("Veuillez sélectionner les deux fichiers !");
 //     return;
 //   }
 
+//   const formData = new FormData();
+//   formData.append("banque", fichierBanque);
+//   formData.append("transport", fichierTransporteur);
+
 //   try {
-//     // Upload fichiers (tu peux garder ça)
-//     const formDataBanque = new FormData();
-//     formDataBanque.append("file", fichierBanque);
+//     const response = await axios.post("http://localhost:8080/api/rapport/generer", formData, {
+//       headers: { "Content-Type": "multipart/form-data" },
+//     });
 
-//     const formDataTransport = new FormData();
-//     formDataTransport.append("file", fichierTransporteur);
-
-//     await Promise.all([
-//       axios.post("http://localhost:8080/api/details/banque/upload", formDataBanque),
-//       axios.post("http://localhost:8080/api/details/transport/upload", formDataTransport),
-//     ]);
-
-//     // 🛠️ Formatage de la date : "2025-02-21" ➝ "21/02/2025"
-//     const dateObj = new Date(date);
-//     const formattedDate = dateObj.toLocaleDateString("fr-FR"); // → "21/02/2025"
-
-//     // Appel GET avec date au bon format
-//     const [resBanque, resTransport] = await Promise.all([
-//       axios.get("http://localhost:8080/api/details/banque", {
-//         params: { date: formattedDate },
-//       }),
-//       axios.get("http://localhost:8080/api/details/transport", {
-//         params: { date: formattedDate },
-//       }),
-//     ]);
-
-//     // Mise à jour de l'état
-//     setDetailsBanque(resBanque.data);
-// setDetailsTransport(resTransport.data);
-
-//   setSelectedDate(date);
-
-
-
+//     setRapport(response.data);
+//     setShowModal(true); // Afficher la modal
 //   } catch (error) {
-//     console.error("Erreur lors du chargement des détails:", error);
-//     alert("Erreur lors du chargement des détails.");
+//     console.error("Erreur lors de la génération du rapport", error);
+//     alert("Erreur lors de la génération du rapport.");
 //   }
 // };
-
+const [showModal, setShowModal] = useState(false);
 
   const handleGenererRapport = async () => {
     if (!fichierBanque || !fichierTransporteur) {
@@ -208,191 +186,291 @@ const formatDateFR = (dateStr) => {
       const response = await axios.post("http://localhost:8080/api/rapport/generer", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      navigate("/rapportpage", { state: { rapport: response.data } });
+
+      localStorage.setItem("rapport", JSON.stringify(response.data));
+      setShowModal(true); // afficher le modal
     } catch (error) {
       console.error("Erreur lors de la génération du rapport", error);
       alert("Erreur lors de la génération du rapport.");
     }
   };
 
+
+
+  if (!role) {
+    return <div>Loading...</div>
+  }
+
   return (
     <div className="dashboard-container">
-      {/* Contenu similaire pour la sidebar, header, etc. */}
-
-      <section className="controle-factures">
-        <h2>Contrôle des factures</h2>
-
-        <div className="file-inputs">
-          <div className="file-group">
-            <label htmlFor="banque-file">Fichier Banque :</label>
-            <input
-              type="file"
-              id="banque-file"
-              accept=".xlsx, .xls"
-              onChange={(e) => handleFileChange(e, "banque")}
-            />
-            {fichierBanque && <p>Fichier sélectionné : {fichierBanque.name}</p>}
-          </div>
-
-          <div className="file-group">
-            <label htmlFor="transporteur-file">Fichier Transporteur :</label>
-            <input
-              type="file"
-              id="transporteur-file"
-              accept=".xlsx, .xls"
-              onChange={(e) => handleFileChange(e, "transporteur")}
-            />
-            {fichierTransporteur && <p>Fichier sélectionné : {fichierTransporteur.name}</p>}
-          </div>
-        </div>
-
-        <div className="actions">
-          <button className="btn-primary" onClick={handleSubmit} disabled={loading}>
-            {loading ? "Chargement..." : "Comparer"}
-          </button>
-          <button className="btn-secondary" onClick={handleGenererRapport} disabled={loading}>
-            Générer rapport complet
+      {/* Sidebar */}
+      <aside className={`sidebar ${sidebarOpen ? "open" : "closed"}`}>
+        <div className="sidebar-header">
+          <img src="assetsss/logo/logo-full.png" alt="Logo" width={120} height={60} className="sidebar-logo" />
+          <button className="close-sidebar" onClick={toggleSidebar}>
+            <X size={20} />
           </button>
         </div>
 
-        {comparaisonResult.length > 0 && (
-          <table className="comparaison-table">
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Passages Banque</th>
-                <th>Montant Banque</th>
-                <th>Passages Transport</th>
-                <th>Montant Transport</th>
-                <th>Détails</th>
-              </tr>
-            </thead>
-            <tbody>
-  {comparaisonResult.map((ligne, index) => {
-    
-    //const normalizedDate = new Date(ligne.date.split("/").reverse().join("-")).toISOString().split("T")[0];
-    
-    return (
-   
+        <nav className="sidebar-nav">
+          <ul>
+            {role === "ADMIN_USER" && (
+              <li>
+                <Link to="/utilisateurs">
+                  <CreditCard size={20} />
+                  <span>Gérer Utilisateurs</span>
+                </Link>
+              </li>
+            )}
+            {role === "ADMIN_FUNCTIONAL" && (
+              <>
+                <li className={activeTab === "acceuil" ? "active" : ""} onClick={() => setActiveTab("acceuil")}>
+                  <Link to="/acceuil">
+                    <Home size={20} />
+                    <span>Tableau de bord</span>
+                  </Link>
+                </li>
+                <li className={activeTab === "factures" ? "active" : ""} onClick={() => setActiveTab("factures")}>
+                  <Link to="/controle-factures">
+                    <FileText size={20} />
+                    <span>Factures</span>
+                  </Link>
+                </li>
+                <li
+                  className={activeTab === "gerer-caisse" ? "active" : ""}
+                  onClick={() => setActiveTab("gerer-caisse")}
+                >
+                  <Link to="/gerer-caisse">
+                    <FileText size={20} />
+                    <span>Gerer Caisse</span>
+                  </Link>
+                </li>
+               
+              </>
+            )}
+          </ul>
+        </nav>
 
-    
-      <React.Fragment key={index}>
-        <tr>
-          <td>{ligne.date}</td>
-          <td>{ligne.nbPassagesBanque}</td>
-          <td>{(ligne.montantBanque ?? 0).toFixed(2)} DT</td>
-          <td>{ligne.nbPassagesTransporteur}</td>
-          <td>{(ligne.montantTransporteur ?? 0).toFixed(2)} DT</td>
-          <td>
-           <button onClick={() => handleVoirDetails(index, ligne.date)}>
-          {selectedDetailIndex === index && selectedDate === ligne.date ? "Masquer" : "Voir détails"}
-        </button>
-      </td>
-    </tr>
+        <div className="sidebar-footer">
+          <button className="logout-button" onClick={handleLogout}>
+            <LogOut size={20} />
+            <span>Déconnexion</span>
+          </button>
+        </div>
+      </aside>
 
-   {selectedDetailIndex === index && (
+      {/* Main content */}
+      <main className={`main-content ${sidebarOpen ? "sidebar-open" : "sidebar-closed"}`} style={{width : '100%' }}>
+        <header className="dashboard-header">
+          <div className="header-left">
+            <button className="menu-toggle" onClick={toggleSidebar}>
+              <Menu size={24} />
+            </button>
+          </div>
 
-      <tr className="details-row">
-        <td colSpan="6">
-          <div className="details-container">
-            <div className="banque-details">
-              <h4>Détails Banque</h4>
-              {ligne.detailsBanque ? (
-                <ul>
-                  <li>Date: {ligne.detailsBanque.date}</li>
-                  <li>Nombre passages: {ligne.detailsBanque.nbPassages}</li>
-                </ul>
-              ) : (
-                <p>Aucun détail disponible</p>
-              )}
-            </div>
+          <div className="header-right">
+            <div className="user-menu">
+              <button className="user-menu-button" onClick={toggleMobileMenu}>
+                <div className="user-avatar">
+                  <User size={20} />
+                </div>
+                <div className="user-info">
+                  <span className="user-name">{displayName}</span>
+                  <span className="user-role">{role}</span>
+                </div>
+                <ChevronDown size={16} />
+              </button>
 
-            <div className="transporteur-details">
-              <h4>Détails Transporteur</h4>
-              {ligne.detailsTransporteur ? (
-                <ul>
-                  <li>Date: {ligne.detailsTransporteur.date}</li>
-                  <li>Nombre passages: {ligne.detailsTransporteur.nbPassages}</li>
-                  <li>TRP: {ligne.detailsTransporteur.trp}</li>
-                  <li>TRT: {ligne.detailsTransporteur.trt}</li>
-                  <li>Montant: {ligne.detailsTransporteur.montant.toFixed(2)} DT</li>
-                </ul>
-              ) : (
-                <p>Aucun détail disponible</p>
+              {mobileMenuOpen && (
+                <div className="user-dropdown">
+                  <Link to="/profil">
+                    <User size={16} />
+                    <span>Mon profil</span>
+                  </Link>
+                  <button onClick={handleLogout}>
+                    <LogOut size={16} />
+                    <span>Déconnexion</span>
+                  </button>
+                </div>
               )}
             </div>
           </div>
-        </td>
-      </tr>
-    )}
+        </header>
 
-{ligne.date && selectedDate && formatDateFR(ligne.date) === selectedDate && (
-  
-  <tr>
-    <td colSpan="6">
-      <div className="mt-4 bg-white shadow-md p-4 rounded-lg border border-gray-200">
-        <h5 className="text-md font-semibold mb-2">
-          Matching – Détails croisés pour la date {formatDateFR(ligne.date)}
-        </h5>
-        <table className="w-full text-sm text-left border">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="px-2 py-1 border">AGSA</th>
-              <th className="px-2 py-1 border">NOMP</th>
-              <th className="px-2 py-1 border">Type</th>
-              <th className="px-2 py-1 border">NbPass (Banque)</th>
-              <th className="px-2 py-1 border">Nature</th>
-              <th className="px-2 py-1 border">NbPass (Transp)</th>
-              <th className="px-2 py-1 border">TRP</th>
-              <th className="px-2 py-1 border">TRT</th>
-              <th className="px-2 py-1 border">Montant</th>
-              <th className="px-2 py-1 border">Résultat</th>
-              <th className="px-2 py-1 border">Libellé</th>
-              <th className="px-2 py-1 border">DATE (Banque)</th>
-               <th className="px-2 py-1 border">DATE (Transp)</th>
-            </tr>
-          </thead>
-          <tbody>
-            {detailsBanque.map((banque, i) => {
-              const transport = detailsTransport[i] || {};
-              return (
-                <tr key={i}>
-                  <td className="px-2 py-1 border">{banque.agsa}</td>
-                  <td className="px-2 py-1 border">{banque.nomp}</td>
-                  <td className="px-2 py-1 border">{banque.type}</td>
-                  <td className="px-2 py-1 border">{banque.nbPassages}</td>
-                 
-                  <td className="px-2 py-1 border">{transport.nature}</td>
-                  <td className="px-2 py-1 border">{transport.nbPassages}</td>
-                  <td className="px-2 py-1 border">{transport.trp}</td>
-                  <td className="px-2 py-1 border">{transport.trt}</td>
-                    
-                  <td className="px-2 py-1 border">
-                    {transport.montant ? transport.montant.toFixed(2) : "-"} DT
-                  </td>
-                  <td className="px-2 py-1 border">{transport.resultat}</td>
-                  <td className="px-2 py-1 border">{transport.libelle}</td>
-                  <td className="px-2 py-1 border">{transport.date}</td>
-                   <td className="px-2 py-1 border">{banque.date}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-          </div>
-        </td>
-      </tr>
-    )}
-  </React.Fragment>
-);
-  })}
-</tbody>
+        <div className="dashboard-content">
+          
+          <section className="controle-factures">
+            <h2>Contrôle des factures</h2>
 
-          </table>
-        )}
-      </section>
+            <div className="import-container">
+              <div className="file-inputs">
+                <div className="file-group input-group">
+                  <label htmlFor="banque-file">Fichier Banque :</label>
+                  <input
+                    type="file"
+                    id="banque-file"
+                    accept=".xlsx, .xls"
+                    onChange={(e) => handleFileChange(e, "banque")}
+                  />
+                  {fichierBanque && <p>Fichier sélectionné : {fichierBanque.name}</p>}
+                </div>
+
+                <div className="file-group input-group">
+                  <label htmlFor="transporteur-file">Fichier Transporteur :</label>
+                  <input
+                    type="file"
+                    id="transporteur-file"
+                    accept=".xlsx, .xls"
+                    onChange={(e) => handleFileChange(e, "transporteur")}
+                  />
+                  {fichierTransporteur && <p>Fichier sélectionné : {fichierTransporteur.name}</p>}
+                </div>
+              </div>
+
+              <div className="actions">
+                <button className="btn-primary" onClick={handleSubmit} disabled={loading}>
+                  {loading ? "Chargement..." : "Comparer"}
+                </button>
+                  <button onClick={handleGenererRapport} className="btn btn-primary">
+        Générer le rapport
+      </button>
+
+      <RapportModalBootstrap show={showModal} onHide={() => setShowModal(false)} />
+
+              </div>
+            </div>
+
+            {comparaisonResult.length > 0 && (
+              <div className="table-container">
+                <table className="comparaison-table">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Passages Banque</th>
+                      <th>Montant Banque</th>
+                      <th>Passages Transport</th>
+                      <th>Montant Transport</th>
+                      <th>Détails</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {comparaisonResult.map((ligne, index) => (
+                      <React.Fragment key={index}>
+                        <tr>
+                          <td>{ligne.date}</td>
+                          <td>{ligne.nbPassagesBanque}</td>
+                          <td>{(ligne.montantBanque ?? 0).toFixed(2)} DT</td>
+                          <td>{ligne.nbPassagesTransporteur}</td>
+                          <td>{(ligne.montantTransporteur ?? 0).toFixed(2)} DT</td>
+                          <td>
+                            <button onClick={() => handleVoirDetails(index, ligne.date)}>
+                              {selectedDetailIndex === index && selectedDate === ligne.date
+                                ? "Masquer"
+                                : "Voir détails"}
+                            </button>
+                          </td>
+                        </tr>
+
+                        {selectedDetailIndex === index && (
+                          <tr className="details-row">
+                            <td colSpan="6">
+                              <div className="details-container">
+                                <div className="banque-details">
+                                  <h4>Détails Banque</h4>
+                                  {ligne.detailsBanque ? (
+                                    <ul>
+                                      <li>Date: {ligne.detailsBanque.date}</li>
+                                      <li>Nombre passages: {ligne.detailsBanque.nbPassages}</li>
+                                    </ul>
+                                  ) : (
+                                    <p>Aucun détail disponible</p>
+                                  )}
+                                </div>
+
+                                <div className="transporteur-details">
+                                  <h4>Détails Transporteur</h4>
+                                  {ligne.detailsTransporteur ? (
+                                    <ul>
+                                      <li>Date: {ligne.detailsTransporteur.date}</li>
+                                      <li>Nombre passages: {ligne.detailsTransporteur.nbPassages}</li>
+                                      <li>TRP: {ligne.detailsTransporteur.trp}</li>
+                                      <li>TRT: {ligne.detailsTransporteur.trt}</li>
+                                      <li>Montant: {ligne.detailsTransporteur.montant.toFixed(2)} DT</li>
+                                    </ul>
+                                  ) : (
+                                    <p>Aucun détail disponible</p>
+                                  )}
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+
+                        {ligne.date && selectedDate && formatDateFR(ligne.date) === selectedDate && (
+                          <tr>
+                            <td colSpan="6">
+                              <div className="matching-details">
+                                <h5>Matching – Détails croisés pour la date {formatDateFR(ligne.date)}</h5>
+                                <table className="details-table">
+                                  <thead>
+                                    <tr>
+                                      <th>AGSA</th>
+                                      <th>NOMP</th>
+                                      <th>Type</th>
+                                      <th>NbPass (Banque)</th>
+                                      <th>Nature</th>
+                                      <th>NbPass (Transp)</th>
+                                      <th>TRP</th>
+                                      <th>TRT</th>
+                                      <th>Montant</th>
+                                      <th>Résultat</th>
+                                      <th>Libellé</th>
+                                      <th>DATE (Banque)</th>
+                                      <th>DATE (Transp)</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {detailsBanque.map((banque, i) => {
+                                      const transport = detailsTransport[i] || {}
+                                      return (
+                                        <tr key={i}>
+                                          <td>{banque.agsa}</td>
+                                          <td>{banque.nomp}</td>
+                                          <td>{banque.type}</td>
+                                          <td>{banque.nbPassages}</td>
+                                          <td>{transport.nature}</td>
+                                          <td>{transport.nbPassages}</td>
+                                          <td>{transport.trp}</td>
+                                          <td>{transport.trt}</td>
+                                          <td>{transport.montant ? transport.montant.toFixed(2) : "-"} DT</td>
+                                          <td>{transport.resultat}</td>
+                                          <td>{transport.libelle}</td>
+                                          <td>{transport.date}</td>
+                                          <td>{banque.date}</td>
+                                        </tr>
+                                      )
+                                    })}
+                                  </tbody>
+                                </table>
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                      </React.Fragment>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+          </section>
+        </div>
+
+
+
+      </main>
     </div>
-  );
+  )
 }
 
-export default ControleFactures;
+export default ControleFactures

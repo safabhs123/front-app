@@ -1,9 +1,17 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function RapportPage() {
-  const location = useLocation();
   const navigate = useNavigate();
-  const rapport = location.state?.rapport || [];
+  const [rapport, setRapport] = useState([]);
+
+  useEffect(() => {
+    const storedRapport = localStorage.getItem("rapport");
+    if (storedRapport) {
+      setRapport(JSON.parse(storedRapport));
+      localStorage.removeItem("rapport"); // nettoyage après usage
+    }
+  }, []);
 
   return (
     <div>

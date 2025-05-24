@@ -1,8 +1,33 @@
+/* Import Dashboard styles */
+@import "./Dashboard.css";
+
+/* Général */
 body {
-  font-family: 'Segoe UI', Tahoma, sans-serif;
+  font-family: "Segoe UI", Tahoma, sans-serif;
   background-color: #f5f5f5;
   color: #333;
+  margin: 0;
+  padding: 0;
 }
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+/* Header */
+.header {
+  background-color: #000000;
+  color: #ffffff;
+  padding: 1rem;
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+/* Input groups */
 .input-group {
   margin-bottom: 1rem;
 }
@@ -11,6 +36,7 @@ body {
   font-weight: bold;
   margin-bottom: 0.3rem;
 }
+
 .equal-true {
   color: green !important;
   font-weight: bold;
@@ -20,27 +46,41 @@ body {
   color: red !important;
   font-weight: bold;
 }
+
+/* Details container */
 .details-container {
   display: flex;
   gap: 2rem;
   justify-content: space-between;
+  margin: 1rem 0;
 }
-.banque-details, .transporteur-details {
+
+.banque-details,
+.transporteur-details {
   flex: 1;
   padding: 1rem;
   background-color: #fff;
   border-radius: 0.5rem;
+  border: 1px solid #ddd;
 }
 
+.banque-details h4,
+.transporteur-details h4 {
+  color: #fcb827;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid #fcb827;
+  padding-bottom: 0.5rem;
+}
 
+/* Import container */
 .import-container {
   background-color: white;
   border: 1px solid #ddd;
   border-left: 5px solid #fcb827;
   border-radius: 6px;
-  padding: 20px;
-  max-width: 600px;
-  margin: 40px auto;
+  padding: 30px;
+  max-width: 100%;
+  margin: 20px 0;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 
@@ -50,6 +90,20 @@ body {
   margin-bottom: 20px;
 }
 
+/* File inputs */
+.file-inputs {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.file-group {
+  flex: 1;
+  min-width: 300px;
+}
+
+/* Labels and inputs */
 label {
   font-weight: 600;
   display: block;
@@ -60,8 +114,14 @@ label {
 input[type="file"] {
   display: block;
   margin-bottom: 16px;
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #f9f9f9;
 }
 
+/* Buttons */
 button {
   background-color: #fcb827;
   color: white;
@@ -71,16 +131,121 @@ button {
   cursor: pointer;
   font-weight: 600;
   transition: background-color 0.3s ease;
+  margin-right: 10px;
 }
-html, body {
-  height: 100%;
-  margin: 0;
-}
+
 button:hover {
   background-color: #e0a30d;
 }
 
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
 
+.btn-primary {
+  background-color: #fcb827;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268;
+}
+
+/* Actions */
+.actions {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+/* Tables */
+.table-container {
+  margin: 2rem 0;
+  background-color: #ffffff;
+  padding: 1rem;
+  border-radius: 8px;
+  overflow-x: auto;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+}
+
+.comparaison-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.comparaison-table thead {
+  background-color: #fcb827;
+  color: #000000;
+}
+
+.comparaison-table th,
+.comparaison-table td {
+  padding: 0.8rem;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+.comparaison-table tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.comparaison-table tbody tr:hover {
+  background-color: #f0f0f0;
+}
+
+/* Details row */
+.details-row td {
+  background-color: #f8f9fa !important;
+  padding: 1.5rem !important;
+}
+
+/* Matching details */
+.matching-details {
+  margin-top: 1rem;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.matching-details h5 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #fcb827;
+  border-bottom: 2px solid #fcb827;
+  padding-bottom: 0.5rem;
+}
+
+.details-table {
+  width: 100%;
+  font-size: 0.85rem;
+  border-collapse: collapse;
+}
+
+.details-table thead {
+  background-color: #f1f1f1;
+}
+
+.details-table th,
+.details-table td {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+.details-table tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+/* Pre formatted text */
 pre {
   background-color: #f8f8f8;
   border: 1px solid #ddd;
@@ -90,3 +255,94 @@ pre {
   border-radius: 4px;
 }
 
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 1rem;
+  background-color: #000000;
+  color: #ffffff;
+  margin-top: 2rem;
+  font-size: 0.85rem;
+}
+
+/* Dashboard integration styles */
+.dashboard-container {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  background-color: #f5f5f5;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  transition: margin-left 0.3s ease;
+}
+
+.main-content.sidebar-open {
+  margin-left: 10px;
+}
+
+.main-content.sidebar-closed {
+  margin-left: 0;
+}
+
+.dashboard-content {
+  flex: 1;
+  padding: 0;
+  background-color: #f5f5f5;
+}
+
+.controle-factures {
+  padding: 2rem;
+}
+
+.controle-factures h2 {
+  color: #fcb827;
+  margin-bottom: 2rem;
+  font-size: 2rem;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .main-content.sidebar-open {
+    margin-left: 0;
+  }
+
+  .file-inputs {
+    flex-direction: column;
+  }
+
+  .file-group {
+    min-width: 100%;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+
+  .details-container {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .details-table {
+    font-size: 0.75rem;
+  }
+
+  .details-table th,
+  .details-table td {
+    padding: 0.3rem;
+  }
+}
+
+/* Active sidebar item */
+.sidebar-nav ul li.active {
+  border-radius: 6px;
+}
+
+.sidebar-nav ul li.active a {
+  color: #000000;
+  font-weight: bold;
+}

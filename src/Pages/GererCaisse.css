@@ -1,39 +1,74 @@
-@import "./Acceuil.css";
-/* Import shared styles */
+/* Import Dashboard and shared styles */
+@import "./Dashboard.css";
 
-/* Form Facture specific styles */
-.form-container {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
+/* CSS Variables */
+:root {
+  --white: #ffffff;
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+  --gray-800: #1f2937;
+  --gray-900: #111827;
+  --attijari-orange: #ff9966;
+  --attijari-orange-dark: #e6855c;
+  --attijari-yellow: #fcb827;
+  --red-50: #fef2f2;
+  --red-300: #fca5a5;
+  --red-600: #dc2626;
+  --border-radius: 8px;
+  --box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --transition: all 0.2s ease-in-out;
 }
 
+/* Header */
+.header {
+  background-color: #000000;
+  color: #ffffff;
+  padding: 1rem;
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+/* Main container */
+.liste-caisses-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.section-title h1 {
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--gray-800);
+  margin-bottom: 2rem;
+}
+
+/* Form section */
 .form-section {
   background-color: var(--white);
   border-radius: var(--border-radius);
   padding: 24px;
   box-shadow: var(--box-shadow);
+  margin-bottom: 4rem;
 }
 
-.section-title {
-  font-size: 18px;
+.section-header h2 {
+  font-size: 1.25rem;
   font-weight: 600;
   color: var(--gray-900);
   margin: 0 0 20px;
 }
 
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
 .form-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 16px;
-  margin-bottom: 16px;
+  align-items: end;
 }
 
 .form-group {
@@ -45,6 +80,7 @@
   font-size: 14px;
   color: var(--gray-700);
   margin-bottom: 6px;
+  font-weight: 500;
 }
 
 .form-group input,
@@ -55,6 +91,7 @@
   font-size: 14px;
   color: var(--gray-800);
   background-color: var(--white);
+  transition: var(--transition);
 }
 
 .form-group input:focus,
@@ -64,250 +101,277 @@
   box-shadow: 0 0 0 2px rgba(255, 153, 102, 0.2);
 }
 
-.readonly-input {
-  background-color: var(--gray-100) !important;
-  cursor: not-allowed;
-}
-
-.input-hint {
-  font-size: 12px;
-  color: var(--gray-600);
-  margin-top: 4px;
-}
-
-/* Filters container */
-.filters-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 16px;
-  background-color: var(--white);
-  border-radius: var(--border-radius);
-  padding: 20px;
-  margin-bottom: 24px;
-  box-shadow: var(--box-shadow);
-}
-
-.filters-container input,
-.filters-container select {
-  padding: 10px;
-  border: 1px solid var(--gray-300);
-  border-radius: 4px;
-  font-size: 14px;
-  color: var(--gray-800);
-  background-color: var(--white);
-}
-
-.filters-container input:focus,
-.filters-container select:focus {
-  outline: none;
-  border-color: var(--attijari-orange);
-  box-shadow: 0 0 0 2px rgba(255, 153, 102, 0.2);
-}
-
-.filters-container p {
-  grid-column: 1 / -1;
-  margin: 0;
-  padding: 8px 12px;
-  background-color: var(--attijari-yellow);
-  border-radius: 4px;
-  font-size: 14px;
-  color: var(--gray-800);
-}
-
-/* Add line button */
+/* Add button */
 .add-line-button {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   padding: 10px 16px;
+  background-color: var(--attijari-orange);
+  border: none;
+  border-radius: 4px;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+  height: fit-content;
+}
+
+.add-line-button:hover {
+  background-color: var(--attijari-orange-dark);
+}
+
+/* Table container */
+.table-container {
+  background-color: var(--white);
+  border-radius: var(--border-radius);
+  padding: 1rem;
+  box-shadow: var(--box-shadow);
+  overflow-x: auto;
+  margin-bottom: 2rem;
+}
+
+.caisses-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.caisses-table thead {
+  background-color: var(--gray-300);
+  color: #000000;
+}
+
+.caisses-table th,
+.caisses-table td {
+  padding: 12px;
+  border: 1px solid var(--gray-200);
+  text-align: left;
+}
+
+.caisses-table th {
+  font-weight: 600;
+}
+
+.caisses-table tbody tr:nth-child(even) {
+  background-color: var(--gray-50);
+}
+
+.caisses-table tbody tr:hover {
+  background-color: var(--gray-100);
+}
+
+/* Transporteurs cell */
+.transporteurs-cell {
+  min-width: 300px;
+}
+
+.transporteur-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.transporteur-item:last-child {
+  border-bottom: none;
+}
+
+.transporteur-name {
+  font-weight: 500;
+  color: var(--gray-800);
+}
+
+.transporteur-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.action-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.action-button.edit {
+  background-color: var(--attijari-yellow);
+  color: #000000;
+}
+
+.action-button.edit:hover {
+  background-color: #e0a30d;
+}
+
+.action-button.delete {
+  background-color: var(--red-50);
+  color: var(--red-600);
+  border: 1px solid var(--red-300);
+}
+
+.action-button.delete:hover {
+  background-color: var(--red-600);
+  color: white;
+}
+
+.transporteur-select {
+  padding: 6px;
+  border: 1px solid var(--gray-300);
+  border-radius: 4px;
+  font-size: 12px;
+  background-color: var(--white);
+}
+
+.transporteur-select:focus {
+  outline: none;
+  border-color: var(--attijari-orange);
+}
+
+/* No transporteur */
+.no-transporteur {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.no-transporteur-text {
+  font-style: italic;
+  color: var(--gray-600);
+}
+
+.add-transporteur-button {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
   background-color: var(--white);
   border: 1px solid var(--attijari-orange);
   border-radius: 4px;
   color: var(--attijari-orange);
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 500;
   cursor: pointer;
   transition: var(--transition);
-  margin-bottom: 20px;
 }
 
-.add-line-button:hover {
+.add-transporteur-button:hover {
   background-color: var(--attijari-yellow);
+  color: #000000;
 }
 
-/* Invoice line */
-.ligne-facture {
-  border: 1px solid var(--gray-200);
-  border-radius: 6px;
-  padding: 16px;
-  margin-bottom: 16px;
-  background-color: var(--gray-50);
-}
-
-.ligne-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-}
-
-.ligne-header h3 {
-  font-size: 16px;
-  font-weight: 500;
-  color: var(--gray-800);
-  margin: 0;
-}
-
-.remove-line-button {
+/* Delete button */
+.delete-button {
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  background-color: var(--white);
-  border: 1px solid var(--gray-300);
-  border-radius: 4px;
-  color: var(--gray-600);
-  cursor: pointer;
-  transition: var(--transition);
-}
-
-.remove-line-button:hover {
-  background-color: var(--red-50);
-  border-color: var(--red-300);
-  color: var(--red-600);
-}
-
-/* Form sections */
-.form-subgrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 16px;
-  margin-top: 16px;
-}
-
-.form-subgroup {
-  border: 1px solid var(--gray-200);
-  border-radius: 6px;
-  padding: 16px;
-  background-color: var(--white);
-}
-
-.form-subgroup h4 {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--gray-700);
-  margin: 0 0 12px;
-}
-
-/* Submit button */
-.submit-button {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 24px;
-  background-color: var(--attijari-orange);
+  gap: 6px;
+  padding: 8px 16px;
+  background-color: var(--red-600);
   border: none;
   border-radius: 4px;
-  color: var(--white);
-  font-size: 16px;
+  color: white;
+  font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   transition: var(--transition);
-  margin-top: 20px;
 }
 
-.submit-button:hover {
-  background-color: var(--attijari-orange-dark);
+.delete-button:hover {
+  background-color: #b91c1c;
 }
 
-/* Facture preview */
-.facture-preview {
-  background-color: var(--gray-900);
-  color: var(--gray-100);
-  padding: 16px;
-  border-radius: 6px;
-  font-family: monospace;
-  font-size: 14px;
-  line-height: 1.5;
-  overflow-x: auto;
-  white-space: pre-wrap;
-  margin: 20px 0;
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 1rem;
+  background-color: #000000;
+  color: #ffffff;
+  margin-top: 2rem;
+  font-size: 0.85rem;
 }
 
-/* Export buttons */
-.export-actions {
+/* Dashboard integration styles */
+.dashboard-container {
   display: flex;
-  gap: 12px;
-  margin-top: 16px;
+  min-height: 100vh;
+  background-color: #f5f5f5;
 }
 
-.export-button {
+.main-content {
+  flex: 1;
   display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 16px;
-  background-color: var(--white);
-  border: 1px solid var(--gray-300);
-  border-radius: 4px;
-  color: var(--gray-700);
-  font-size: 14px;
-  cursor: pointer;
-  transition: var(--transition);
+  flex-direction: column;
+  transition: margin-left 0.3s ease;
 }
 
-.export-button:hover {
-  background-color: var(--gray-50);
-  border-color: var(--gray-400);
+.main-content.sidebar-open {
+  margin-left: 250px;
 }
 
-.export-button.pdf {
-  background-color: #2563eb;
-  border-color: #2563eb;
-  color: white;
+.main-content.sidebar-closed {
+  margin-left: 0;
 }
 
-.export-button.pdf:hover {
-  background-color: #1d4ed8;
+.dashboard-content {
+  flex: 1;
+  padding: 0;
+  background-color: #f5f5f5;
 }
 
-.export-button.excel {
-  background-color: #16a34a;
-  border-color: #16a34a;
-  color: white;
-}
-
-.export-button.excel:hover {
-  background-color: #15803d;
-}
-
-.export-button.text {
-  background-color: #4b5563;
-  border-color: #4b5563;
-  color: white;
-}
-
-.export-button.text:hover {
-  background-color: #374151;
-}
-
-/* Responsive styles */
+/* Responsive design */
 @media (max-width: 768px) {
-  .filters-container {
+  .main-content.sidebar-open {
+    margin-left: 0;
+  }
+
+  .liste-caisses-container {
+    padding: 1rem;
+  }
+
+  .form-grid {
     grid-template-columns: 1fr;
   }
-  
-  .form-grid,
-  .form-subgrid {
-    grid-template-columns: 1fr;
+
+  .transporteurs-cell {
+    min-width: 250px;
   }
-  
-  .export-actions {
+
+  .transporteur-item {
     flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
   }
-  
-  .export-button {
-    width: 100%;
-    justify-content: center;
+
+  .no-transporteur {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
   }
+
+  .caisses-table {
+    font-size: 0.85rem;
+  }
+
+  .caisses-table th,
+  .caisses-table td {
+    padding: 8px;
+  }
+}
+
+/* Active sidebar item */
+.sidebar-nav ul li.active {
+  background-color: var(--attijari-yellow);
+  border-radius: 6px;
+}
+
+.sidebar-nav ul li.active a {
+  color: #000000;
+  font-weight: bold;
 }

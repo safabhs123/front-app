@@ -20,7 +20,7 @@ import "./Profil.css";
 import { Link } from "react-router-dom";
 import axios from "axios";
 const Profil = () => {
-	const [sidebarOpen, setSidebarOpen] = useState(true);
+	const [sidebarOpen, setSidebarOpen] = useState(false);
 	const [userData, setUserData] = useState({
 		matricule: "",
 		nom: "",
@@ -101,7 +101,7 @@ const Profil = () => {
 	};
 
 	return (
-		<div className="dashboard-container">
+		<div className="">
 			{/* Sidebar */}
 			<aside className={`sidebar ${sidebarOpen ? "open" : "closed"}`}>
 				<div className="sidebar-header">
@@ -187,10 +187,7 @@ const Profil = () => {
 						<button className="menu-toggle" onClick={toggleSidebar}>
 							<Menu size={24} />
 						</button>
-						<Link to="/acceuil" className="back-link">
-							<ArrowLeft size={20} />
-							<span>Retour au tableau de bord</span>
-						</Link>
+						
 					</div>
 				</header>
 

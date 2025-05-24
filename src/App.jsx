@@ -12,7 +12,9 @@ import ControleFactures from "./Pages/ControleFactures";
 import Profil from "./Pages/Profil";
 import FormFacture from "./Pages/FormFacture";
 import OcrUploader from "./Pages/OcrUploader";
-import RapportPage from "./Pages/RapportPage";
+import RapportPage from "./Pages/RapportPage";import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min';
+
 function App() {
 	return (
 		<BrowserRouter>
