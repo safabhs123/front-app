@@ -27,9 +27,9 @@ function RapportPage() {
               <td>{r.date}</td>
               <td>{r.nbPassagesBanque}</td>
               <td>{r.nbPassagesTransporteur}</td>
-              <td>{r.montantTransporteur.toFixed(2)} €</td>
+              <td>{r.montantTransporteur.toFixed(2)} DT</td>
               <td>{r.ecartPassages}</td>
-              <td>{r.ecartMontant.toFixed(2)} €</td>
+              <td>{r.ecartMontant.toFixed(2)} DT</td>
               <td>{r.statut}</td>
             </tr>
           ))}

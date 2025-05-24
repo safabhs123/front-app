@@ -20,6 +20,18 @@ body {
   color: red !important;
   font-weight: bold;
 }
+.details-container {
+  display: flex;
+  gap: 2rem;
+  justify-content: space-between;
+}
+.banque-details, .transporteur-details {
+  flex: 1;
+  padding: 1rem;
+  background-color: #fff;
+  border-radius: 0.5rem;
+}
+
 
 .import-container {
   background-color: white;
